@@ -3,7 +3,10 @@ package edu.ucam.restcrud.controllers
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoAltaDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
+import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
+import edu.ucam.restcrud.beans.dtos.CorreoDTO
 import edu.ucam.restcrud.services.AlumnoService
+import edu.ucam.restcrud.services.CorreoService
 import jakarta.validation.Valid
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -24,6 +27,8 @@ import org.springframework.web.bind.annotation.ResponseBody
 class AlumnoController {
     @Autowired
     AlumnoService alumnoService
+    @Autowired
+    CorreoService correoService
 
     Logger logger = LoggerFactory.getLogger(AlumnoController.class)
 
@@ -109,6 +114,29 @@ class AlumnoController {
             return ResponseEntity.notFound().build()
         } else {
             return ResponseEntity.ok("Eliminado correctamente")
+        }
+    }
+
+    // CORREO
+    @PostMapping("/correo")
+    @ResponseBody ResponseEntity<?> createCorreo(
+            @RequestParam('id') Integer alumnoId,
+            @Valid @RequestBody CorreoAltaDTO body
+    ) {
+        Optional<CorreoDTO> res = correoService.addToAlumno(alumnoId, body)
+        if (res.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok(res.get())
+        }
+    }
+    @GetMapping("/correo")
+    @ResponseBody ResponseEntity<?> getCorreoFromAlumno(@RequestParam('id') Integer alumnoId) {
+        Optional<List<CorreoDTO>> listaCorreos = correoService.getByUserId(alumnoId)
+        if (listaCorreos.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok(listaCorreos.get())
         }
     }
 
