@@ -25,9 +25,11 @@ class CorreoController {
 
     // [C]reate
     @PostMapping('/alumno/{id}')
-    @ResponseBody ResponseEntity<?> create(@PathVariable('id') Integer alumnoId, @Valid @RequestBody CorreoAltaDTO body) {
+    @ResponseBody ResponseEntity<?> create(
+        @PathVariable('id') Integer alumnoId,
+        @Valid @RequestBody CorreoAltaDTO body
+    ) {
         Optional<CorreoDTO> res = correoService.addToAlumno(alumnoId, body)
-        // Devolvemos OK o NOT FOUND dependiendo de si el ID del alumno es valido o no
         if (res.isEmpty()) {
             return ResponseEntity.notFound().build()
         } else {
@@ -52,7 +54,10 @@ class CorreoController {
 
     // [U]pdate
     @PutMapping("/id/{id}")
-    @ResponseBody ResponseEntity<?> updateById(@PathVariable('id') Integer correoId, @Valid @RequestBody CorreoAltaDTO body) {
+    @ResponseBody ResponseEntity<?> updateById(
+        @PathVariable('id') Integer correoId,
+        @Valid @RequestBody CorreoAltaDTO body
+    ) {
         Optional<CorreoDTO> newCorreo = correoService.updateById(correoId, body)
         if (newCorreo.isEmpty()) {
             return ResponseEntity.notFound().build()
@@ -61,7 +66,10 @@ class CorreoController {
         }
     }
     @PutMapping("/correo/{correo}")
-    @ResponseBody ResponseEntity<?> updateByCorreo(@PathVariable('correo') String direccionCorreo, @Valid @RequestBody CorreoAltaDTO body) {
+    @ResponseBody ResponseEntity<?> updateByCorreo(
+        @PathVariable('correo') String direccionCorreo,
+        @Valid @RequestBody CorreoAltaDTO body
+    ) {
         Optional<CorreoDTO> newCorreo = correoService.updateByCorreo(direccionCorreo, body)
         if (newCorreo.isEmpty()) {
             return ResponseEntity.notFound().build()
@@ -76,7 +84,7 @@ class CorreoController {
         if (!correoService.deleteById(correoId)) {
             return ResponseEntity.notFound().build()
         } else {
-            return ResponseEntity.ok().build()
+            return ResponseEntity.ok("Eliminado correctamente")
         }
     }
     @DeleteMapping("/correo/{correo}")
@@ -84,7 +92,7 @@ class CorreoController {
         if (!correoService.deleteByCorreo(correo)) {
             return ResponseEntity.notFound().build()
         } else {
-            return ResponseEntity.ok().build()
+            return ResponseEntity.ok("Eliminado correctamente")
         }
     }
 }

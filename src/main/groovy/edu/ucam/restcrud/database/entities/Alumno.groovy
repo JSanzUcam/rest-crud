@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
 
 @Entity
@@ -39,4 +40,13 @@ class Alumno {
     )
     @JoinColumn(name = "alumno_id")
     List<Correo> correos
+
+    // Many to Many de Planes
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "alumno_planes",
+        joinColumns = @JoinColumn(name = "alumno_id"),
+        inverseJoinColumns = @JoinColumn(name = "plan_id")
+    )
+    List<Plan> planes
 }

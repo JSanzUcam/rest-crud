@@ -1,10 +1,9 @@
 package edu.ucam.restcrud.services
 
+import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
 import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoDTO
-import edu.ucam.restcrud.database.entities.Alumno
 import edu.ucam.restcrud.database.entities.Correo
-import edu.ucam.restcrud.database.repositories.AlumnoRepository
 import edu.ucam.restcrud.database.repositories.CorreoRepository
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,9 +12,10 @@ import org.springframework.stereotype.Service
 @Service
 class CorreoService {
     @Autowired
-    AlumnoRepository alumnoRepository
-    @Autowired
     CorreoRepository correoRepository
+
+    @Autowired
+    AlumnoService alumnoService
 
     /**
      * Anade un correo a un alumno
@@ -25,9 +25,7 @@ class CorreoService {
      * @return <code>Optional&lt;CorreoDTO&gt;</code> con el correo si se ha anadido o vacio si el alumno no existe
      */
     Optional<CorreoDTO> addToAlumno(Integer alumnoId, @Valid CorreoAltaDTO correoDto) {
-        Optional<Alumno> alumno = alumnoRepository.findById(alumnoId)
-        // Si la ID no existe salimos directamente
-        if (alumno.isEmpty()) {
+        if (!alumnoService.exists(alumnoId)) {
             return Optional.empty()
         }
 
@@ -36,7 +34,7 @@ class CorreoService {
         correo.correo = correoDto.correo
 
         // Anadimos el correo al alumno y lo anadimos al repositorio
-        alumno.get().correos.add(correo)
+        alumnoService.addCorreoToAlumno(alumnoId, correo)
         correoRepository.save(correo)
 
         CorreoDTO dtoSalida = new CorreoDTO(correo)
@@ -63,19 +61,12 @@ class CorreoService {
      * @return Optional de una Lista de CorreosDTO
      */
     Optional<List<CorreoDTO>> getByUserId(Integer alumnoId) {
-        Optional<Alumno> alumno = alumnoRepository.findById(alumnoId)
+        Optional<AlumnoFullDTO> alumno = alumnoService.get(alumnoId, true) as Optional<AlumnoFullDTO>
         if (alumno.isEmpty()) {
             return Optional.empty()
         }
 
-        List<CorreoDTO> correos = alumno.get()
-            .getCorreos()
-            .stream()
-            .map(correo -> {
-                return new CorreoDTO(correo)
-            })
-            .collect()
-
+        List<CorreoDTO> correos = alumno.get().getCorreos()
         return Optional.of(correos)
     }
 

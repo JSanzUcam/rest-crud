@@ -1,19 +1,17 @@
 package edu.ucam.restcrud.controllers
 
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
-import edu.ucam.restcrud.database.entities.Alumno
 import edu.ucam.restcrud.beans.dtos.AlumnoAltaDTO
+import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
 import edu.ucam.restcrud.services.AlumnoService
 import jakarta.validation.Valid
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -31,51 +29,87 @@ class AlumnoController {
 
     // [C]reate
     @PostMapping
-    @ResponseBody ResponseEntity<AlumnoDTO> addAlumno(@Valid @RequestBody AlumnoAltaDTO entradaDto) {
+    @ResponseBody ResponseEntity<AlumnoDTO> create(@Valid @RequestBody AlumnoAltaDTO entradaDto) {
         AlumnoDTO respuestaDto = alumnoService.create(entradaDto)
         ResponseEntity.ok(respuestaDto)
     }
 
     // [R]ead
     @GetMapping
-    @ResponseBody Iterable<AlumnoDTO> getAlumnos(@RequestParam(name = 'correos', required = false) boolean correos) {
-        return alumnoService.getAll(correos)
-    }
-    @GetMapping(path = "/id/{id}")
-    @ResponseBody ResponseEntity<?> getAlumnoById(@PathVariable("id") Integer id, @RequestParam(name = 'correos', required = false) boolean correos) {
-        Optional<AlumnoDTO> optAlumno = alumnoService.get(id, correos)
-        if (optAlumno.empty) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existen alumnos con esa ID")
+    @ResponseBody ResponseEntity<?> get(
+        @RequestParam(name = "id", required = false) Integer id,
+        @RequestParam(name = "dni", required = false) String dni,
+        @RequestParam(name = 'completo', required = false) boolean completo
+    ) {
+        // Si no estamos buscando por ID o DNI mostramos todo.
+        if (!(id || dni)) {
+            return ResponseEntity.ok(alumnoService.getAll(completo))
         }
-        return ResponseEntity.ok(optAlumno.get())
-    }
-    @GetMapping(path = "/dni/{dni}")
-    @ResponseBody ResponseEntity<?> getAlumnosByDni(@PathVariable("dni") String dni) {
-        Optional<Alumno> optAlumno = alumnoService.get(dni)
-        if (optAlumno.empty) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existen alumnos con esa ID")
+
+        Optional<AlumnoDTO> optAlumno
+        if (id) {
+            optAlumno = alumnoService.get(id, completo)
+        } else {
+            optAlumno = alumnoService.get(dni, completo)
         }
-        return ResponseEntity.ok(optAlumno.get())
+
+        if (optAlumno.empty) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok(optAlumno.get())
+        }
     }
-    @GetMapping(path = "/nombre/{nombre}")
-    @ResponseBody Iterable<Alumno> getAlumnosByNombre(@PathVariable("nombre") String nombre) {
+    @GetMapping("buscar")
+    @ResponseBody List<AlumnoDTO> search(@RequestParam("nombre") String nombre) {
         return alumnoService.findWithNameContaining(nombre)
     }
 
     // [U]pdate
-    @PutMapping(path = "/{id}")
-    @ResponseBody ResponseEntity<?> updateAlumno(@Valid @RequestBody AlumnoAltaDTO dto, @PathVariable("id") Integer id) {
-        if (alumnoService.update(id, dto))
-            return ResponseEntity.ok("Alumno modificado")
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existen alumnos con esa ID")
+    @PutMapping
+    @ResponseBody ResponseEntity<?> update(
+        @RequestParam("id") Integer id,
+        @Valid @RequestBody AlumnoAltaDTO dto
+    ) {
+        Optional<AlumnoDTO> alumnoOpt = alumnoService.update(id, dto)
+        if (alumnoOpt.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok(alumnoOpt.get())
+        }
+    }
+    @PutMapping("/plan")
+    @ResponseBody ResponseEntity<?> addPlan(
+        @RequestParam(name = "id") Integer id,
+        @RequestBody Map<String, Object> plan
+    ) {
+        // El JSON es valido?
+        boolean containsNombre = plan.containsKey("nombre")
+        boolean containsId = plan.containsKey("id")
+        if (!(containsId || containsNombre))
+            return ResponseEntity.badRequest().build()
+
+        Optional<AlumnoFullDTO> alumno
+        if (containsNombre) {
+            alumno = alumnoService.addPlan(id, plan.get("nombre") as String)
+        } else {
+            alumno = alumnoService.addPlan(id, plan.get("id") as Integer)
+        }
+
+        if (alumno.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok(alumno.get())
+        }
     }
 
     // [D]elete
-    @DeleteMapping(path = "/{id}")
-    @ResponseBody ResponseEntity<?> deleteAlumno(@PathVariable("id") Integer id) {
-        if (!alumnoService.delete(id))
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existen alumnos con esa ID")
-        return ResponseEntity.ok("Alumno eliminado")
+    @DeleteMapping
+    @ResponseBody ResponseEntity<?> delete(@RequestParam("id") Integer id) {
+        if (!alumnoService.delete(id)) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok("Eliminado correctamente")
+        }
     }
 
     // DEBUG: Nuke. Borra todos los contenidos de la tabla
