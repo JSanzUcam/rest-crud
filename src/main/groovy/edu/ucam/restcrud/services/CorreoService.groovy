@@ -89,7 +89,7 @@ class CorreoService {
     Optional<CorreoDTO> updateCorreoById(Integer id, CorreoAltaDTO newCorreo) {
         Optional<Correo> correoOpt = correoRepository.findById(id)
         if (correoOpt.isEmpty()) {
-            return Optional.empty();
+            return Optional.empty()
         }
 
         Correo correo = correoOpt.get()
