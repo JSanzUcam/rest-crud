@@ -86,14 +86,59 @@ class CorreoService {
      * @param newCorreo el nuevo correo en forma de CorreoAltaDTO
      * @return Un Optional con el DTO de objeto modificado o nada si no se encontro un correo con esa ID
      */
-    Optional<CorreoDTO> updateCorreoById(Integer id, CorreoAltaDTO newCorreo) {
+    Optional<CorreoDTO> updateById(Integer id, @Valid CorreoAltaDTO newCorreo) {
         Optional<Correo> correoOpt = correoRepository.findById(id)
         if (correoOpt.isEmpty()) {
             return Optional.empty()
         }
 
         Correo correo = correoOpt.get()
-        return Optional.of(updateCorreo(correo, newCorreo))
+        return Optional.of(update(correo, newCorreo))
+    }
+
+    /**
+     * Encuentra el correo con la direccion especificada y le cambia la direccion
+     *
+     * @param correoOrig la direccion de correo original
+     * @param newCorreo la nueva direccion de correo
+     * @return Un Optional con el DTO de objeto modificado o nada si no se encontro un correo con esa direccion
+     */
+    Optional<CorreoDTO> updateByCorreo(String correoOrig, @Valid CorreoAltaDTO newCorreo) {
+        Optional<Correo> correoOpt = correoRepository.findByCorreo(correoOrig)
+        if (correoOpt.isEmpty()) {
+            return Optional.empty()
+        }
+
+        Correo correo = correoOpt.get()
+        return Optional.of(update(correo, newCorreo))
+    }
+
+    /**
+     * Elimina un correo a partir de su ID
+     *
+     * @param id la ID del correo a eliminar
+     * @return true si se ha eliminado, false si no se encontro el correo
+     */
+    boolean deleteById(Integer id) {
+        if (correoRepository.findById(id).empty) {
+            return false
+        }
+        correoRepository.deleteById(id)
+        return true
+    }
+
+    /**
+     * Elimina un correo a partir de su direccion de correo
+     *
+     * @param id la ID del correo a eliminar
+     * @return true si se ha eliminado, false si no se encontro el correo
+     */
+    boolean deleteByCorreo(String correo) {
+        if (correoRepository.findByCorreo(correo).empty) {
+            return false
+        }
+        correoRepository.deleteByCorreo(correo)
+        return true
     }
 
 
@@ -104,7 +149,7 @@ class CorreoService {
      * @param newCorreo La nueva direccion de correo en un CorreoAltaDTO
      * @return el objeto actualizado en forma de DTO
      */
-    private CorreoDTO updateCorreo(Correo correo, CorreoAltaDTO newCorreo) {
+    private CorreoDTO update(Correo correo, CorreoAltaDTO newCorreo) {
         correo.setCorreo(newCorreo.correo)
         correoRepository.save(correo)
 

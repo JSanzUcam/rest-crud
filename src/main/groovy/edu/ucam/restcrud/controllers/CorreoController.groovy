@@ -7,6 +7,7 @@ import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,7 +25,7 @@ class CorreoController {
 
     // [C]reate
     @PostMapping('/alumno/{id}')
-    @ResponseBody ResponseEntity<?> crearCorreo(@PathVariable('id') Integer alumnoId, @Valid @RequestBody CorreoAltaDTO body) {
+    @ResponseBody ResponseEntity<?> create(@PathVariable('id') Integer alumnoId, @Valid @RequestBody CorreoAltaDTO body) {
         Optional<CorreoDTO> res = correoService.addToAlumno(alumnoId, body)
         // Devolvemos OK o NOT FOUND dependiendo de si el ID del alumno es valido o no
         if (res.isEmpty()) {
@@ -36,11 +37,11 @@ class CorreoController {
 
     // [R]ead
     @GetMapping
-    @ResponseBody Iterable<CorreoDTO> getCorreos() {
+    @ResponseBody Iterable<CorreoDTO> getAll() {
         return correoService.getAll()
     }
     @GetMapping("/alumno/{id}")
-    @ResponseBody ResponseEntity<?> getCorreosFromAlumno(@PathVariable('id') Integer alumnoId) {
+    @ResponseBody ResponseEntity<?> getFromAlumno(@PathVariable('id') Integer alumnoId) {
         Optional<List<CorreoDTO>> listaCorreos = correoService.getByUserId(alumnoId)
         if (listaCorreos.isEmpty()) {
             return ResponseEntity.notFound().build()
@@ -51,8 +52,8 @@ class CorreoController {
 
     // [U]pdate
     @PutMapping("/id/{id}")
-    @ResponseBody ResponseEntity<?> updateCorreo(@PathVariable('id') Integer correoId, @RequestBody CorreoAltaDTO body) {
-        Optional<CorreoDTO> newCorreo = correoService.updateCorreoById(correoId, body)
+    @ResponseBody ResponseEntity<?> updateById(@PathVariable('id') Integer correoId, @Valid @RequestBody CorreoAltaDTO body) {
+        Optional<CorreoDTO> newCorreo = correoService.updateById(correoId, body)
         if (newCorreo.isEmpty()) {
             return ResponseEntity.notFound().build()
         } else {
@@ -60,7 +61,30 @@ class CorreoController {
         }
     }
     @PutMapping("/correo/{correo}")
-    @ResponseBody ResponseEntity<?> updateCorreoByCorreo(@PathVariable('correo') Integer correoId, @RequestBody CorreoAltaDTO body) {
+    @ResponseBody ResponseEntity<?> updateByCorreo(@PathVariable('correo') String direccionCorreo, @Valid @RequestBody CorreoAltaDTO body) {
+        Optional<CorreoDTO> newCorreo = correoService.updateByCorreo(direccionCorreo, body)
+        if (newCorreo.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok(newCorreo.get())
+        }
+    }
 
+    // [D]elete
+    @DeleteMapping("/id/{id}")
+    @ResponseBody ResponseEntity<?> deleteById(@PathVariable('id') Integer correoId) {
+        if (!correoService.deleteById(correoId)) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok().build()
+        }
+    }
+    @DeleteMapping("/correo/{correo}")
+    @ResponseBody ResponseEntity<?> deleteByCorreo(@PathVariable('correo') String correo) {
+        if (!correoService.deleteByCorreo(correo)) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok().build()
+        }
     }
 }
