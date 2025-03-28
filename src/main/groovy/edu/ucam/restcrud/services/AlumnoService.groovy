@@ -17,12 +17,12 @@ class AlumnoService {
     @Autowired
     AlumnoRepository alumnoRepository
 
-    // Esto hace falta para poder anadir Planes (Entidad) a Alumnos (Entidad)
+    // Esto hace falta para poder añadir Planes (Entidad) a Alumnos (Entidad)
     @Autowired
     PlanRepository planRepository
 
     /**
-     * Anade o edita un alumno en la base de datos
+     * Añade o edita un alumno en la base de datos
      *
      * @param alumno DTO con datos del alumno con o sin ID
      * @return Optional con los datos del alumno creado o modificado
@@ -30,8 +30,8 @@ class AlumnoService {
     Optional<AlumnoDTO> save(@Valid AlumnoDTO alumnoDto) {
         Alumno alumno
         if (alumnoDto.id == null) {
-            // INFO: Groovy da un aviso aqui a pesar de que si que estemos usando
-            //       esta asignacion. Pasa lo mismo en la siguiente
+            // INFO: Groovy da un aviso aquí a pesar de que si que estemos usando
+            //       esta asignación. Pasa lo mismo en la siguiente
             //noinspection GroovyUnusedAssignment
             alumno = new Alumno()
         } else if (alumnoRepository.existsById(alumnoDto.id)) {
@@ -55,7 +55,7 @@ class AlumnoService {
     /**
      * Devuelve todos los datos de alumnos
      *
-     * @param completo booleano indicando si se deberian devolver TODOS los datos del alumno
+     * @param completo booleano indicando si se deberían devolver TODOS los datos del alumno
      * @return Lista de datos de alumnos
      */
     List<AlumnoDTO> getAll(boolean completo = false) {
@@ -84,7 +84,7 @@ class AlumnoService {
     /**
      * Devuelve el alumno con la ID especificada
      *
-     * @param id ID numerica del alumno
+     * @param id ID numérica del alumno
      * @param completo Booleano indicando si se deben mostrar todos los datos
      * @return un valor opcional con el alumno encontrado o nada
      */
@@ -94,9 +94,9 @@ class AlumnoService {
     }
 
     /**
-     * Devuelve el alumno con el Numero de documento especificado
+     * Devuelve el alumno con el Número de documento especificado
      *
-     * @param numeroDocumento El Numero de documento (unico) del alumno
+     * @param numeroDocumento El Número de documento (único) del alumno
      * @param completo Booleano indicando si se deben mostrar todos los datos
      * @return un valor opcional con el alumno encontrado o nada
      */
@@ -108,7 +108,7 @@ class AlumnoService {
     /**
      * Busca en la base de datos los alumnos cuyo nombre contenga el nombre indicado
      *
-     * @param substring La seccion del nombre a buscar
+     * @param substring La sección del nombre a buscar
      * @param completo Booleano indicando si se deben mostrar todos los datos
      * @return List<AlumnoDTO> con los alumnos cuyo nombre contenga `substring`
      */
@@ -146,7 +146,7 @@ class AlumnoService {
     /**
      * Elimina un alumno de la base de datos a partir de su ID
      *
-     * @param id Identificador unico del alumno
+     * @param id Identificador único del alumno
      * @return true si se ha eliminado el alumno, false si no se ha eliminado
      */
     boolean delete(Integer id) {
@@ -166,11 +166,11 @@ class AlumnoService {
     }
 
     /**
-     * Anade un nuevo correo al alumno. Esto no guarda el correo
+     * Añade un nuevo correo al alumno. Esto no guarda el correo
      * en la base de datos
      *
      * @param id ID del alumno
-     * @param correo Entidad Correo a anadir
+     * @param correo Entidad Correo a añadir
      */
     void addCorreoToAlumno(Integer id, Correo correo) {
         Optional<Alumno> alumno = alumnoRepository.findById(id)
@@ -209,7 +209,7 @@ class AlumnoService {
         if (optPlan.isEmpty()) {
             return Optional.empty()
         }
-        // No queremos anadir varias veces el mismo plan
+        // No queremos añadir varias veces el mismo plan
         if (alumno.planes.contains(optPlan.get())) {
             return Optional.of(new AlumnoFullDTO(alumno))
         }

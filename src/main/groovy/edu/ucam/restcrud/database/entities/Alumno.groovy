@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import edu.ucam.restcrud.beans.enums.TipoDocumentoEnum
 import groovyjarjarantlr4.v4.runtime.misc.NotNull
 import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated

@@ -28,7 +28,7 @@ class PlanService {
 
     List<PlanDTO> getAll(boolean alumnos = false, boolean completo = false) {
         List<Plan> planes = planRepository.findAll() as List<Plan>
-        // Convertir Planes en DTOs con parametros opcionales (alumnos? correos de los alumnos?)
+        // Convertir Planes en DTOs con parámetros opcionales (alumnos? correos de los alumnos?)
         List<PlanDTO> planesDto = planes
             .stream()
             .map(plan -> {

@@ -19,7 +19,7 @@ class DocumentFormatValidator implements ConstraintValidator<DocumentFormat, Alu
             case TipoDocumentoEnum.NIE:
                 return alumno.numeroDocumento.matches('^[XYZ]-?[0-9]{7}-?[A-Z]$')
             case TipoDocumentoEnum.Pasaporte:
-                // Mas de 7 caracteres alfanumericos
+                // Mas de 7 caracteres alfanuméricos
                 return alumno.numeroDocumento.matches('^[A-Za-z0-9]{7,}$')
         }
         // Esto no deberia pasar nunca pero soluciona avisos

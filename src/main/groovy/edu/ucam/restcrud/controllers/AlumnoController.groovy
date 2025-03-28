@@ -36,7 +36,7 @@ class AlumnoController {
     // [C]reate
     @PostMapping
     @ResponseBody ResponseEntity<AlumnoDTO> create(@Valid @RequestBody AlumnoDTO entradaDto) {
-        // Nos aseguramos de que no estamos modificando ningun alumno existente
+        // Nos aseguramos de que no estamos modificando ningún alumno existente
         entradaDto.id = null
         AlumnoDTO respuestaDto = alumnoService.save(entradaDto).get()
         ResponseEntity.ok(respuestaDto)
@@ -49,7 +49,7 @@ class AlumnoController {
         @RequestParam(name = "numeroDocumento", required = false) String numeroDocumento,
         @RequestParam(name = 'completo', required = false) boolean completo
     ) {
-        // Si no estamos buscando por ID o Numero de Documento mostramos todo.
+        // Si no estamos buscando por ID o Número de Documento mostramos todo.
         if (!(id || numeroDocumento)) {
             return ResponseEntity.ok(alumnoService.getAll(completo))
         }
@@ -73,7 +73,7 @@ class AlumnoController {
     }
     /**
      * Demuestra el uso de @JsonIgnore desde la entidad.
-     * Este metodo devuelve los alumnos sin sus correos o planes
+     * Este método devuelve los alumnos sin sus correos o planes
      *
      * @return todos los alumnos como entidades, no como DTO.
      */
@@ -103,7 +103,7 @@ class AlumnoController {
         @RequestParam(name = "id") Integer id,
         @RequestBody Map<String, Object> plan
     ) {
-        // El JSON es valido?
+        // El JSON es válido?
         boolean containsNombre = plan.containsKey("nombre")
         boolean containsId = plan.containsKey("id")
         if (!(containsId || containsNombre))
