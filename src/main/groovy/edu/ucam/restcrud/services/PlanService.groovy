@@ -42,6 +42,18 @@ class PlanService {
         return planesDto
     }
 
+    Optional<PlanDTO> update(Integer id, PlanAltaDTO planDto) {
+        Optional<Plan> planOpt = planRepository.findById(id)
+        if (planOpt.isEmpty()) {
+            return Optional.empty()
+        }
+        Plan plan = planOpt.get
+        plan.nombre = planDto.nombre
+        plan.tipo = planDto.tipo
+        planRepository.save(plan)
+        return Optional.of(new PlanDTO(plan))
+    }
+
     boolean delete(Integer id) {
         Optional<Plan> plan = planRepository.findById(id)
         if (plan.isEmpty()) {

@@ -88,23 +88,6 @@ class CorreoService {
     }
 
     /**
-     * Encuentra el correo con la direccion especificada y le cambia la direccion
-     *
-     * @param correoOrig la direccion de correo original
-     * @param newCorreo la nueva direccion de correo
-     * @return Un Optional con el DTO de objeto modificado o nada si no se encontro un correo con esa direccion
-     */
-    Optional<CorreoDTO> updateByCorreo(String correoOrig, @Valid CorreoAltaDTO newCorreo) {
-        Optional<Correo> correoOpt = correoRepository.findByCorreo(correoOrig)
-        if (correoOpt.isEmpty()) {
-            return Optional.empty()
-        }
-
-        Correo correo = correoOpt.get()
-        return Optional.of(update(correo, newCorreo))
-    }
-
-    /**
      * Elimina un correo a partir de su ID
      *
      * @param id la ID del correo a eliminar
@@ -117,21 +100,6 @@ class CorreoService {
         correoRepository.deleteById(id)
         return true
     }
-
-    /**
-     * Elimina un correo a partir de su direccion de correo
-     *
-     * @param id la ID del correo a eliminar
-     * @return true si se ha eliminado, false si no se encontro el correo
-     */
-    boolean deleteByCorreo(String correo) {
-        if (correoRepository.findByCorreo(correo).empty) {
-            return false
-        }
-        correoRepository.deleteByCorreo(correo)
-        return true
-    }
-
 
     /**
      * Cambia la direccion de correo a una entidad de Correo

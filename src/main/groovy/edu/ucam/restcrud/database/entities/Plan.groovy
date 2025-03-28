@@ -1,7 +1,6 @@
 package edu.ucam.restcrud.database.entities
 
 import edu.ucam.restcrud.beans.enums.TipoPersonaEnum
-import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType

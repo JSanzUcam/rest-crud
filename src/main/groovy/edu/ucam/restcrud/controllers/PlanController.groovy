@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -20,6 +21,11 @@ class PlanController {
     @Autowired
     PlanService planService
 
+    @PostMapping
+    @ResponseBody ResponseEntity<PlanDTO> create(@RequestBody PlanAltaDTO planDto) {
+        return ResponseEntity.ok(planService.create(planDto))
+    }
+
     @GetMapping
     @ResponseBody List<PlanDTO> getAll(
         @RequestParam(name = "alumnos", required = false) boolean incluirAlumnos,
@@ -28,9 +34,16 @@ class PlanController {
         return planService.getAll(incluirAlumnos, alumnosCompletos)
     }
 
-    @PostMapping
-    @ResponseBody ResponseEntity<PlanDTO> create(@RequestBody PlanAltaDTO planDto) {
-        return ResponseEntity.ok(planService.create(planDto))
+    @PutMapping
+    @ResponseBody ResponseEntity<?> update(
+        @RequestParam("id") Integer id,
+        @RequestBody PlanAltaDTO planDto
+    ) {
+        Optional<PlanDTO> planOpt = planService.update(id, planDto)
+        if (planOpt.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        }
+        return ResponseEntity.ok(planOpt.get())
     }
 
     @DeleteMapping
