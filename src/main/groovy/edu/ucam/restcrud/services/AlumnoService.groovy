@@ -1,6 +1,6 @@
 package edu.ucam.restcrud.services
 
-import edu.ucam.restcrud.beans.dtos.AlumnoAltaDTO
+
 import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 import edu.ucam.restcrud.database.entities.Alumno
@@ -27,11 +27,11 @@ class AlumnoService {
      * @param alumno DTO con datos del alumno sin la ID
      * @return true si se ha creado, false en caso de error
      */
-    AlumnoDTO create(@Valid AlumnoAltaDTO alumno) {
+    AlumnoDTO create(@Valid AlumnoDTO alumno) {
         Alumno newAlumno = new Alumno()
         newAlumno.setDni(alumno.getDni())
-        newAlumno.setNombreCompleto(alumno.getNombre())
-        newAlumno.setFechaNacimiento(alumno.getFecha())
+        newAlumno.setNombreCompleto(alumno.getNombreCompleto())
+        newAlumno.setFechaNacimiento(alumno.getFechaNacimiento())
         alumnoRepository.save(newAlumno)
 
         return new AlumnoDTO(newAlumno)
@@ -106,14 +106,14 @@ class AlumnoService {
      * @param dto DTO de datos del alumno
      * @return true si se actualizan los datos, false en caso de que la ID no exista
      */
-    Optional<AlumnoDTO> update(Integer id, @Valid AlumnoAltaDTO dto) {
+    Optional<AlumnoDTO> update(Integer id, @Valid AlumnoDTO dto) {
         def optAlumno = alumnoRepository.findById(id)
         if (!optAlumno.empty) {
             def alumno = optAlumno.get()
             // Set datos
             alumno.setDni(dto.getDni())
-            alumno.setNombreCompleto(dto.getNombre())
-            alumno.setFechaNacimiento(dto.getFecha())
+            alumno.setNombreCompleto(dto.getNombreCompleto())
+            alumno.setFechaNacimiento(dto.getFechaNacimiento())
             alumnoRepository.save(alumno)
 
             return Optional.of(new AlumnoDTO(alumno))

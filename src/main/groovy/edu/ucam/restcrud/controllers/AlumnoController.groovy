@@ -1,7 +1,7 @@
 package edu.ucam.restcrud.controllers
 
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
-import edu.ucam.restcrud.beans.dtos.AlumnoAltaDTO
+
 import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
 import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoDTO
@@ -34,7 +34,7 @@ class AlumnoController {
 
     // [C]reate
     @PostMapping
-    @ResponseBody ResponseEntity<AlumnoDTO> create(@Valid @RequestBody AlumnoAltaDTO entradaDto) {
+    @ResponseBody ResponseEntity<AlumnoDTO> create(@Valid @RequestBody AlumnoDTO entradaDto) {
         AlumnoDTO respuestaDto = alumnoService.create(entradaDto)
         ResponseEntity.ok(respuestaDto)
     }
@@ -73,7 +73,7 @@ class AlumnoController {
     @PutMapping
     @ResponseBody ResponseEntity<?> update(
         @RequestParam("id") Integer id,
-        @Valid @RequestBody AlumnoAltaDTO dto
+        @Valid @RequestBody AlumnoDTO dto
     ) {
         Optional<AlumnoDTO> alumnoOpt = alumnoService.update(id, dto)
         if (alumnoOpt.isEmpty()) {

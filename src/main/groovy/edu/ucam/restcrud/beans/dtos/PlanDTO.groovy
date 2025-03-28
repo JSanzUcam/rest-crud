@@ -13,4 +13,28 @@ class PlanDTO {
         this.nombre = p.nombre
         this.tipo = p.tipo
     }
+
+    Integer getId() {
+        return id
+    }
+
+    void setId(Integer id) {
+        this.id = id
+    }
+
+    String getNombre() {
+        return nombre
+    }
+
+    void setNombre(String nombre) {
+        this.nombre = nombre
+    }
+
+    TipoPersonaEnum getTipo() {
+        return tipo
+    }
+
+    void setTipo(TipoPersonaEnum tipo) {
+        this.tipo = tipo
+    }
 }

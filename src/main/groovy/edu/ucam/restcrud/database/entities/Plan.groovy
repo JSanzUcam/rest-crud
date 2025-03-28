@@ -1,5 +1,6 @@
 package edu.ucam.restcrud.database.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import edu.ucam.restcrud.beans.enums.TipoPersonaEnum
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -28,5 +29,38 @@ class Plan {
         fetch = FetchType.LAZY,
         mappedBy = "planes"
     )
+    @JsonIgnore
     List<Alumno> alumnos
+
+    Integer getId() {
+        return id
+    }
+
+    void setId(Integer id) {
+        this.id = id
+    }
+
+    List<Alumno> getAlumnos() {
+        return alumnos
+    }
+
+    void setAlumnos(List<Alumno> alumnos) {
+        this.alumnos = alumnos
+    }
+
+    TipoPersonaEnum getTipo() {
+        return tipo
+    }
+
+    void setTipo(TipoPersonaEnum tipo) {
+        this.tipo = tipo
+    }
+
+    String getNombre() {
+        return nombre
+    }
+
+    void setNombre(String nombre) {
+        this.nombre = nombre
+    }
 }

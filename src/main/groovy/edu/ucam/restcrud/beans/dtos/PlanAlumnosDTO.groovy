@@ -18,4 +18,12 @@ class PlanAlumnosDTO extends PlanDTO {
             })
             .collect()
     }
+
+    List<AlumnoDTO> getAlumnos() {
+        return alumnos
+    }
+
+    void setAlumnos(List<AlumnoDTO> alumnos) {
+        this.alumnos = alumnos
+    }
 }

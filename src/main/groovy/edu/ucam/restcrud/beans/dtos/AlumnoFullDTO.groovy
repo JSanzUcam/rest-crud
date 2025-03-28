@@ -21,4 +21,20 @@ class AlumnoFullDTO extends AlumnoDTO {
             })
             .collect()
     }
+
+    List<CorreoDTO> getCorreos() {
+        return correos
+    }
+
+    void setCorreos(List<CorreoDTO> correos) {
+        this.correos = correos
+    }
+
+    List<PlanDTO> getPlanes() {
+        return planes
+    }
+
+    void setPlanes(List<PlanDTO> planes) {
+        this.planes = planes
+    }
 }
