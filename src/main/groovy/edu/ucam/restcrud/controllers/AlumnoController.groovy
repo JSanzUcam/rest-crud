@@ -46,11 +46,11 @@ class AlumnoController {
     @GetMapping
     @ResponseBody ResponseEntity<?> get(
         @RequestParam(name = "id", required = false) Integer id,
-        @RequestParam(name = "dni", required = false) String dni,
+        @RequestParam(name = "numeroDocumento", required = false) String numeroDocumento,
         @RequestParam(name = 'completo', required = false) boolean completo
     ) {
-        // Si no estamos buscando por ID o DNI mostramos todo.
-        if (!(id || dni)) {
+        // Si no estamos buscando por ID o Numero de Documento mostramos todo.
+        if (!(id || numeroDocumento)) {
             return ResponseEntity.ok(alumnoService.getAll(completo))
         }
 
@@ -58,7 +58,7 @@ class AlumnoController {
         if (id) {
             optAlumno = alumnoService.get(id, completo)
         } else {
-            optAlumno = alumnoService.get(dni, completo)
+            optAlumno = alumnoService.get(numeroDocumento, completo)
         }
 
         if (optAlumno.empty) {

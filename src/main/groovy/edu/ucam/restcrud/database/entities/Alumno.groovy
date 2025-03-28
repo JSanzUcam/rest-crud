@@ -2,10 +2,13 @@ package edu.ucam.restcrud.database.entities
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
+import edu.ucam.restcrud.beans.enums.TipoDocumentoEnum
 import groovyjarjarantlr4.v4.runtime.misc.NotNull
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
@@ -20,10 +23,13 @@ class Alumno {
     @GeneratedValue
     Integer id
 
-    // DNI es String por la letra
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    TipoDocumentoEnum tipoDocumento
+
     @NotNull
     @Column(unique = true)
-    String dni
+    String numeroDocumento
 
     // Nombre con apellidos
     @NotNull
@@ -61,12 +67,20 @@ class Alumno {
         this.id = id
     }
 
-    String getDni() {
-        return dni
+    TipoDocumentoEnum getTipoDocumento() {
+        return tipoDocumento
     }
 
-    void setDni(String dni) {
-        this.dni = dni
+    void setTipoDocumento(TipoDocumentoEnum tipoDocumento) {
+        this.tipoDocumento = tipoDocumento
+    }
+
+    String getNumeroDocumento() {
+        return numeroDocumento
+    }
+
+    void setNumeroDocumento(String numeroDocumento) {
+        this.numeroDocumento = numeroDocumento
     }
 
     String getNombreCompleto() {

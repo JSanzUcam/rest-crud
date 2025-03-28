@@ -44,7 +44,8 @@ class AlumnoService {
             return Optional.empty()
         }
 
-        alumno.setDni(alumnoDto.getDni())
+        alumno.setTipoDocumento(alumnoDto.getTipoDocumento())
+        alumno.setNumeroDocumento(alumnoDto.getNumeroDocumento())
         alumno.setNombreCompleto(alumnoDto.getNombreCompleto())
         alumno.setFechaNacimiento(alumnoDto.getFechaNacimiento())
         alumnoRepository.save(alumno)
@@ -93,14 +94,14 @@ class AlumnoService {
     }
 
     /**
-     * Devuelve el alumno con el DNI especificado
+     * Devuelve el alumno con el Numero de documento especificado
      *
-     * @param dni El DNI (unico) del alumno
+     * @param numeroDocumento El Numero de documento (unico) del alumno
      * @param completo Booleano indicando si se deben mostrar todos los datos
      * @return un valor opcional con el alumno encontrado o nada
      */
-    Optional<AlumnoDTO> get(String dni, boolean completo = false) {
-        Optional<Alumno> alumno = alumnoRepository.findByDni(dni)
+    Optional<AlumnoDTO> get(String numeroDocumento, boolean completo = false) {
+        Optional<Alumno> alumno = alumnoRepository.findByNumeroDocumento(numeroDocumento)
         return optionalDtoFromOptionalAlumno(alumno, completo)
     }
 
