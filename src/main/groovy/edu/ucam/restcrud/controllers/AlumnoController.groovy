@@ -5,6 +5,7 @@ import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
 import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoDTO
+import edu.ucam.restcrud.database.entities.Alumno
 import edu.ucam.restcrud.services.AlumnoService
 import edu.ucam.restcrud.services.CorreoService
 import jakarta.validation.Valid
@@ -35,7 +36,9 @@ class AlumnoController {
     // [C]reate
     @PostMapping
     @ResponseBody ResponseEntity<AlumnoDTO> create(@Valid @RequestBody AlumnoDTO entradaDto) {
-        AlumnoDTO respuestaDto = alumnoService.create(entradaDto)
+        // Nos aseguramos de que no estamos modificando ningun alumno existente
+        entradaDto.id = null
+        AlumnoDTO respuestaDto = alumnoService.save(entradaDto).get()
         ResponseEntity.ok(respuestaDto)
     }
 
@@ -64,18 +67,31 @@ class AlumnoController {
             return ResponseEntity.ok(optAlumno.get())
         }
     }
-    @GetMapping("buscar")
+    @GetMapping("/buscar")
     @ResponseBody List<AlumnoDTO> search(@RequestParam("nombre") String nombre) {
         return alumnoService.findWithNameContaining(nombre)
+    }
+    /**
+     * Demuestra el uso de @JsonIgnore desde la entidad.
+     * Este metodo devuelve los alumnos sin sus correos o planes
+     *
+     * @return todos los alumnos como entidades, no como DTO.
+     */
+    @GetMapping("/test-ignore")
+    @ResponseBody Iterable<Alumno> getAllRaw() {
+        return alumnoService.getAllRaw()
     }
 
     // [U]pdate
     @PutMapping
     @ResponseBody ResponseEntity<?> update(
-        @RequestParam("id") Integer id,
         @Valid @RequestBody AlumnoDTO dto
     ) {
-        Optional<AlumnoDTO> alumnoOpt = alumnoService.update(id, dto)
+        if (dto.id == null) {
+            return ResponseEntity.badRequest().build()
+        }
+
+        Optional<AlumnoDTO> alumnoOpt = alumnoService.save(dto)
         if (alumnoOpt.isEmpty()) {
             return ResponseEntity.notFound().build()
         } else {

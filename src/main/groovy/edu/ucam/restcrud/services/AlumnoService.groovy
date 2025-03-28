@@ -22,28 +22,42 @@ class AlumnoService {
     PlanRepository planRepository
 
     /**
-     * Anade un alumno nuevo a la base de datos
+     * Anade o edita un alumno en la base de datos
      *
-     * @param alumno DTO con datos del alumno sin la ID
-     * @return true si se ha creado, false en caso de error
+     * @param alumno DTO con datos del alumno con o sin ID
+     * @return Optional con los datos del alumno creado o modificado
      */
-    AlumnoDTO create(@Valid AlumnoDTO alumno) {
-        Alumno newAlumno = new Alumno()
-        newAlumno.setDni(alumno.getDni())
-        newAlumno.setNombreCompleto(alumno.getNombreCompleto())
-        newAlumno.setFechaNacimiento(alumno.getFechaNacimiento())
-        alumnoRepository.save(newAlumno)
+    Optional<AlumnoDTO> save(@Valid AlumnoDTO alumnoDto) {
+        Alumno alumno
+        if (alumnoDto.id == null) {
+            // INFO: Groovy da un aviso aqui a pesar de que si que estemos usando
+            //       esta asignacion. Pasa lo mismo en la siguiente
+            //noinspection GroovyUnusedAssignment
+            alumno = new Alumno()
+        } else if (alumnoRepository.existsById(alumnoDto.id)) {
+            //noinspection GroovyUnusedAssignment
+            alumno = alumnoRepository.findById(alumnoDto.id).get()
+        }
 
-        return new AlumnoDTO(newAlumno)
+        // Si no se ha encontrado el alumno devolvemos empty
+        if (alumno == null) {
+            return Optional.empty()
+        }
+
+        alumno.setDni(alumnoDto.getDni())
+        alumno.setNombreCompleto(alumnoDto.getNombreCompleto())
+        alumno.setFechaNacimiento(alumnoDto.getFechaNacimiento())
+        alumnoRepository.save(alumno)
+        return Optional.of(new AlumnoDTO(alumno))
     }
 
     /**
      * Devuelve todos los datos de alumnos
      *
      * @param completo booleano indicando si se deberian devolver TODOS los datos del alumno
-     * @return Iterable con datos de alumnos
+     * @return Lista de datos de alumnos
      */
-    Iterable<AlumnoDTO> getAll(boolean completo = false) {
+    List<AlumnoDTO> getAll(boolean completo = false) {
         List<Alumno> alumnos = alumnoRepository.findAll() as List<Alumno>
         return alumnos.stream().map(a -> {
             if (completo) {
@@ -52,6 +66,18 @@ class AlumnoService {
                 return new AlumnoDTO(a)
             }
         }).collect()
+    }
+
+    /**
+     * Devuelve una lista de todos los alumnos
+     * como entidades sin usar DTOs.
+     *
+     * Los correos y planes no se serializan
+     *
+     * @return Iterable de Alumnos
+     */
+    Iterable<Alumno> getAllRaw() {
+        return alumnoRepository.findAll()
     }
 
     /**
@@ -97,28 +123,6 @@ class AlumnoService {
                 }
             })
             .collect()
-    }
-
-    /**
-     * Modifica los datos de un alumno en concreto usando su ID
-     *
-     * @param id Identificador unico del alumno
-     * @param dto DTO de datos del alumno
-     * @return true si se actualizan los datos, false en caso de que la ID no exista
-     */
-    Optional<AlumnoDTO> update(Integer id, @Valid AlumnoDTO dto) {
-        def optAlumno = alumnoRepository.findById(id)
-        if (!optAlumno.empty) {
-            def alumno = optAlumno.get()
-            // Set datos
-            alumno.setDni(dto.getDni())
-            alumno.setNombreCompleto(dto.getNombreCompleto())
-            alumno.setFechaNacimiento(dto.getFechaNacimiento())
-            alumnoRepository.save(alumno)
-
-            return Optional.of(new AlumnoDTO(alumno))
-        }
-        return Optional.empty()
     }
 
     Optional<AlumnoFullDTO> addPlan(Integer id, Integer plan) {
