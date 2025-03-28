@@ -16,8 +16,11 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
+import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = ['tipo_documento', 'numero_documento']))
 class Alumno {
     @Id
     @GeneratedValue
@@ -28,7 +31,6 @@ class Alumno {
     TipoDocumentoEnum tipoDocumento
 
     @NotNull
-    @Column(unique = true)
     String numeroDocumento
 
     // Nombre con apellidos
