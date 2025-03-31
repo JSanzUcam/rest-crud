@@ -12,8 +12,6 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.JoinTable
-import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
@@ -51,14 +49,12 @@ class Alumno {
     List<Correo> correos
 
     // Many to Many de Planes
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @JoinTable(
-        name = "alumno_planes",
-        joinColumns = @JoinColumn(name = "alumno_id"),
-        inverseJoinColumns = @JoinColumn(name = "plan_id")
+    @OneToMany(
+        fetch = FetchType.LAZY,
+        mappedBy = "alumno"
     )
-    List<Plan> planes
+    @JsonIgnore
+    List<AlumnoPlan> planAssoc
 
     Integer getId() {
         return id
@@ -108,11 +104,20 @@ class Alumno {
         this.correos = correos
     }
 
-    List<Plan> getPlanes() {
-        return planes
+    List<AlumnoPlan> getPlanAssoc() {
+        return planAssoc
     }
 
-    void setPlanes(List<Plan> planes) {
-        this.planes = planes
+    void setPlanAssoc(List<AlumnoPlan> planAssoc) {
+        this.planAssoc = planAssoc
+    }
+
+    List<Plan> getPlanes() {
+        return planAssoc
+            .stream()
+            .map(plan -> {
+                plan.plan
+            })
+            .collect()
     }
 }

@@ -1,6 +1,6 @@
 package edu.ucam.restcrud.beans.enums
 
-enum TipoPersonaEnum {
+enum TipoEstudioEnum {
     Grado,
     Master,
     TituloPropio

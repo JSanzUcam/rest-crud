@@ -1,6 +1,6 @@
 package edu.ucam.restcrud.controllers
 
-import edu.ucam.restcrud.beans.dtos.PlanAltaDTO
+
 import edu.ucam.restcrud.beans.dtos.PlanDTO
 import edu.ucam.restcrud.services.PlanService
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,7 +22,7 @@ class PlanController {
     PlanService planService
 
     @PostMapping
-    @ResponseBody ResponseEntity<PlanDTO> create(@RequestBody PlanAltaDTO planDto) {
+    @ResponseBody ResponseEntity<PlanDTO> create(@RequestBody PlanDTO planDto) {
         return ResponseEntity.ok(planService.create(planDto))
     }
 
@@ -35,11 +35,8 @@ class PlanController {
     }
 
     @PutMapping
-    @ResponseBody ResponseEntity<?> update(
-        @RequestParam("id") Integer id,
-        @RequestBody PlanAltaDTO planDto
-    ) {
-        Optional<PlanDTO> planOpt = planService.update(id, planDto)
+    @ResponseBody ResponseEntity<?> update(@RequestBody PlanDTO planDto) {
+        Optional<PlanDTO> planOpt = planService.update(planDto)
         if (planOpt.isEmpty()) {
             return ResponseEntity.notFound().build()
         }

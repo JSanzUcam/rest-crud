@@ -1,7 +1,7 @@
 package edu.ucam.restcrud.database.entities
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import edu.ucam.restcrud.beans.enums.TipoPersonaEnum
+import edu.ucam.restcrud.beans.enums.TipoEstudioEnum
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -9,7 +9,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
-import jakarta.persistence.ManyToMany
+import jakarta.persistence.OneToMany
 import jakarta.validation.constraints.NotNull
 
 @Entity
@@ -23,14 +23,14 @@ class Plan {
     String nombre
 
     @Enumerated(EnumType.STRING)
-    TipoPersonaEnum tipo
+    TipoEstudioEnum tipo
 
-    @ManyToMany(
+    @OneToMany(
         fetch = FetchType.LAZY,
-        mappedBy = "planes"
+        mappedBy = "plan"
     )
     @JsonIgnore
-    List<Alumno> alumnos
+    List<AlumnoPlan> alumnoAssoc
 
     Integer getId() {
         return id
@@ -40,19 +40,19 @@ class Plan {
         this.id = id
     }
 
-    List<Alumno> getAlumnos() {
-        return alumnos
+    List<AlumnoPlan> getAlumnoAssoc() {
+        return alumnoAssoc
     }
 
-    void setAlumnos(List<Alumno> alumnos) {
-        this.alumnos = alumnos
+    void setAlumnoAssoc(List<AlumnoPlan> alumnoAssoc) {
+        this.alumnoAssoc = alumnoAssoc
     }
 
-    TipoPersonaEnum getTipo() {
+    TipoEstudioEnum getTipo() {
         return tipo
     }
 
-    void setTipo(TipoPersonaEnum tipo) {
+    void setTipo(TipoEstudioEnum tipo) {
         this.tipo = tipo
     }
 
@@ -62,5 +62,14 @@ class Plan {
 
     void setNombre(String nombre) {
         this.nombre = nombre
+    }
+
+    List<Alumno> getAlumnos() {
+        alumnoAssoc
+            .stream()
+            .map(alumno -> {
+                alumno.alumno
+            })
+            .collect()
     }
 }

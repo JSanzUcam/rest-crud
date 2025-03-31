@@ -4,7 +4,7 @@ import edu.ucam.restcrud.database.entities.Alumno
 
 class AlumnoFullDTO extends AlumnoDTO {
     List<CorreoDTO> correos
-    List<PlanDTO> planes
+    List<PlanCursoDTO> planes
 
     AlumnoFullDTO(Alumno a) {
         super(a)
@@ -14,10 +14,10 @@ class AlumnoFullDTO extends AlumnoDTO {
                 return new CorreoDTO(correo)
             })
             .collect()
-        this.planes = a.planes
+        this.planes = a.planAssoc
             .stream()
             .map(plan -> {
-                return new PlanDTO(plan)
+                return new PlanCursoDTO(plan.plan, plan.curso)
             })
             .collect()
     }
@@ -30,11 +30,11 @@ class AlumnoFullDTO extends AlumnoDTO {
         this.correos = correos
     }
 
-    List<PlanDTO> getPlanes() {
+    List<PlanCursoDTO> getPlanes() {
         return planes
     }
 
-    void setPlanes(List<PlanDTO> planes) {
+    void setPlanes(List<PlanCursoDTO> planes) {
         this.planes = planes
     }
 }

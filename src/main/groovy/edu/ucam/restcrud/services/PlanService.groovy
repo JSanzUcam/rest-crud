@@ -1,6 +1,6 @@
 package edu.ucam.restcrud.services
 
-import edu.ucam.restcrud.beans.dtos.PlanAltaDTO
+
 import edu.ucam.restcrud.beans.dtos.PlanAlumnosDTO
 import edu.ucam.restcrud.beans.dtos.PlanDTO
 import edu.ucam.restcrud.database.entities.Alumno
@@ -17,7 +17,7 @@ class PlanService {
     @Autowired
     AlumnoRepository alumnoRepository
 
-    PlanDTO create(PlanAltaDTO planDto) {
+    PlanDTO create(PlanDTO planDto) {
         Plan plan = new Plan()
         plan.nombre = planDto.nombre
         plan.tipo = planDto.tipo
@@ -42,12 +42,12 @@ class PlanService {
         return planesDto
     }
 
-    Optional<PlanDTO> update(Integer id, PlanAltaDTO planDto) {
-        Optional<Plan> planOpt = planRepository.findById(id)
+    Optional<PlanDTO> update(PlanDTO planDto) {
+        Optional<Plan> planOpt = planRepository.findById(planDto.id)
         if (planOpt.isEmpty()) {
             return Optional.empty()
         }
-        Plan plan = planOpt.get
+        Plan plan = planOpt.get()
         plan.nombre = planDto.nombre
         plan.tipo = planDto.tipo
         planRepository.save(plan)
@@ -60,9 +60,9 @@ class PlanService {
             return false
         }
 
-        List<Alumno> alumnos = plan.get().alumnos
+        List<Alumno> alumnos = plan.get().getAlumnos()
         for (Alumno alumno : alumnos) {
-            alumno.planes.remove(plan.get())
+            alumno.getPlanes().remove(plan.get())
         }
 
         planRepository.deleteById(id)

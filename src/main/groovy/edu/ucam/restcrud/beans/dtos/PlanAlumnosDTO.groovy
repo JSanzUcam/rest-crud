@@ -7,13 +7,13 @@ class PlanAlumnosDTO extends PlanDTO {
 
     PlanAlumnosDTO(Plan p, boolean correos = false) {
         super(p)
-        this.alumnos = p.alumnos
+        this.alumnos = p.alumnoAssoc
             .stream()
             .map(alumno -> {
                 if (correos) {
-                    return new AlumnoFullDTO(alumno)
+                    return new AlumnoFullDTO(alumno.alumno)
                 } else {
-                    return new AlumnoDTO(alumno)
+                    return new AlumnoDTO(alumno.alumno)
                 }
             })
             .collect()

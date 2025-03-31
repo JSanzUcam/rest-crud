@@ -5,6 +5,7 @@ import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
 import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoDTO
+import edu.ucam.restcrud.beans.dtos.PlanCursoDTO
 import edu.ucam.restcrud.database.entities.Alumno
 import edu.ucam.restcrud.services.AlumnoService
 import edu.ucam.restcrud.services.CorreoService
@@ -100,21 +101,10 @@ class AlumnoController {
     }
     @PutMapping("/plan")
     @ResponseBody ResponseEntity<?> addPlan(
-        @RequestParam(name = "id") Integer id,
-        @RequestBody Map<String, Object> plan
+        @RequestParam("id") Integer alumnoId,
+        @RequestBody PlanCursoDTO plan
     ) {
-        // El JSON es válido?
-        boolean containsNombre = plan.containsKey("nombre")
-        boolean containsId = plan.containsKey("id")
-        if (!(containsId || containsNombre))
-            return ResponseEntity.badRequest().build()
-
-        Optional<AlumnoFullDTO> alumno
-        if (containsNombre) {
-            alumno = alumnoService.addPlan(id, plan.get("nombre") as String)
-        } else {
-            alumno = alumnoService.addPlan(id, plan.get("id") as Integer)
-        }
+        Optional<AlumnoFullDTO> alumno = alumnoService.addPlan(alumnoId, plan)
 
         if (alumno.isEmpty()) {
             return ResponseEntity.notFound().build()

@@ -3,9 +3,12 @@ package edu.ucam.restcrud.services
 
 import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
+import edu.ucam.restcrud.beans.dtos.PlanCursoDTO
 import edu.ucam.restcrud.database.entities.Alumno
+import edu.ucam.restcrud.database.entities.AlumnoPlan
 import edu.ucam.restcrud.database.entities.Correo
 import edu.ucam.restcrud.database.entities.Plan
+import edu.ucam.restcrud.database.repositories.AlumnoPlanRepository
 import edu.ucam.restcrud.database.repositories.AlumnoRepository
 import edu.ucam.restcrud.database.repositories.PlanRepository
 import jakarta.validation.Valid
@@ -16,10 +19,10 @@ import org.springframework.stereotype.Service
 class AlumnoService {
     @Autowired
     AlumnoRepository alumnoRepository
-
-    // Esto hace falta para poder añadir Planes (Entidad) a Alumnos (Entidad)
     @Autowired
     PlanRepository planRepository
+    @Autowired
+    AlumnoPlanRepository alumnoPlanRepository
 
     /**
      * Añade o edita un alumno en la base de datos
@@ -126,21 +129,28 @@ class AlumnoService {
             .collect()
     }
 
-    Optional<AlumnoFullDTO> addPlan(Integer id, Integer plan) {
+    /**
+     * Actualiza el alumno para asignarle un plan y un curso.
+     *
+     * @param id
+     * @param plan
+     * @return
+     */
+    Optional<AlumnoFullDTO> addPlan(Integer id, PlanCursoDTO plan) {
         Optional<Alumno> optAlumno = alumnoRepository.findById(id)
         if (optAlumno.isEmpty()) {
             return Optional.empty()
         }
-        Optional<Plan> optPlan = planRepository.findById(plan)
-        return addOptionalPlan(optPlan, optAlumno.get())
-    }
-    Optional<AlumnoFullDTO> addPlan(Integer id, String plan) {
-        Optional<Alumno> optAlumno = alumnoRepository.findById(id)
-        if (optAlumno.isEmpty()) {
+        Optional<Plan> optPlan
+        if (plan.id != null) {
+            optPlan = planRepository.findById(plan.id)
+        } else if (plan.nombre != null) {
+            optPlan = planRepository.findByNombre(plan.nombre)
+        } else {
             return Optional.empty()
         }
-        Optional<Plan> optPlan = planRepository.findByNombre(plan)
-        return addOptionalPlan(optPlan, optAlumno.get())
+
+        return addOptionalPlan(optPlan, optAlumno.get(), plan.curso)
     }
 
     /**
@@ -205,16 +215,22 @@ class AlumnoService {
         }
         return Optional.of(alumnoDTO)
     }
-    private Optional<AlumnoFullDTO> addOptionalPlan(Optional<Plan> optPlan, Alumno alumno) {
+    private Optional<AlumnoFullDTO> addOptionalPlan(Optional<Plan> optPlan, Alumno alumno, short curso) {
         if (optPlan.isEmpty()) {
             return Optional.empty()
         }
         // No queremos añadir varias veces el mismo plan
-        if (alumno.planes.contains(optPlan.get())) {
+        if (alumno.getPlanes().contains(optPlan.get())) {
             return Optional.of(new AlumnoFullDTO(alumno))
         }
 
-        alumno.planes.add(optPlan.get())
+        AlumnoPlan assoc = new AlumnoPlan()
+        assoc.alumno = alumno
+        assoc.plan = optPlan.get()
+        assoc.curso = curso
+
+        alumnoPlanRepository.save(assoc)
+        alumno.planAssoc.add(assoc)
         alumnoRepository.save(alumno)
         return Optional.of(new AlumnoFullDTO(alumno))
     }
