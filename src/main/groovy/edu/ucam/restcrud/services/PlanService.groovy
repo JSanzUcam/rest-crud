@@ -4,7 +4,9 @@ package edu.ucam.restcrud.services
 import edu.ucam.restcrud.beans.dtos.PlanAlumnosDTO
 import edu.ucam.restcrud.beans.dtos.PlanDTO
 import edu.ucam.restcrud.database.entities.Alumno
+import edu.ucam.restcrud.database.entities.AlumnoPlan
 import edu.ucam.restcrud.database.entities.Plan
+import edu.ucam.restcrud.database.repositories.AlumnoPlanRepository
 import edu.ucam.restcrud.database.repositories.AlumnoRepository
 import edu.ucam.restcrud.database.repositories.PlanRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +18,8 @@ class PlanService {
     PlanRepository planRepository
     @Autowired
     AlumnoRepository alumnoRepository
+    @Autowired
+    AlumnoPlanRepository alumnoPlanRepository
 
     PlanDTO create(PlanDTO planDto) {
         Plan plan = new Plan()
@@ -60,9 +64,11 @@ class PlanService {
             return false
         }
 
-        List<Alumno> alumnos = plan.get().getAlumnos()
-        for (Alumno alumno : alumnos) {
-            alumno.getPlanes().remove(plan.get())
+        List<AlumnoPlan> alumnosPlanes = plan.get().getAlumnoAssoc()
+        for (AlumnoPlan alumnoPlan : alumnosPlanes) {
+            if (alumnoPlan.plan.id == id) {
+                alumnoPlanRepository.delete(alumnoPlan)
+            }
         }
 
         planRepository.deleteById(id)

@@ -122,6 +122,17 @@ class AlumnoController {
             return ResponseEntity.ok("Eliminado correctamente")
         }
     }
+    @DeleteMapping("/plan")
+    @ResponseBody ResponseEntity<?> removePlan(
+        @RequestParam('id') Integer id,
+        @RequestBody PlanCursoDTO plan
+    ) {
+        if (!alumnoService.removePlan(id, plan)) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok("Eliminado correctamente")
+        }
+    }
 
     // CORREO
     @PostMapping("/correo")

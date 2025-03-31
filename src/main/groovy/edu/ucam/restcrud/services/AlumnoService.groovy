@@ -163,8 +163,31 @@ class AlumnoService {
         if (alumnoRepository.findById(id).empty) {
             return false
         }
+
+        // Borrar todos los registros de cursos para este alumno
+        Alumno alumno = alumnoRepository.findById(id).get()
+        for (AlumnoPlan assoc : alumno.planAssoc) {
+            alumnoPlanRepository.delete(assoc)
+        }
+        // Borrar alumno
         alumnoRepository.deleteById(id)
         return true
+    }
+
+    boolean removePlan(Integer id, PlanCursoDTO plan) {
+        if (plan.id == null || !alumnoRepository.existsById(id)) {
+            return false
+        }
+
+        Alumno alumno = alumnoRepository.findById(id).get()
+        boolean deleted = false
+        for (AlumnoPlan assoc : alumno.planAssoc) {
+            if (assoc.plan.id == plan.id && assoc.curso == plan.curso) {
+                deleted = true
+                alumnoPlanRepository.delete(assoc)
+            }
+        }
+        return deleted
     }
 
     /**
@@ -218,10 +241,6 @@ class AlumnoService {
     private Optional<AlumnoFullDTO> addOptionalPlan(Optional<Plan> optPlan, Alumno alumno, short curso) {
         if (optPlan.isEmpty()) {
             return Optional.empty()
-        }
-        // No queremos añadir varias veces el mismo plan
-        if (alumno.getPlanes().contains(optPlan.get())) {
-            return Optional.of(new AlumnoFullDTO(alumno))
         }
 
         AlumnoPlan assoc = new AlumnoPlan()

@@ -111,13 +111,4 @@ class Alumno {
     void setPlanAssoc(List<AlumnoPlan> planAssoc) {
         this.planAssoc = planAssoc
     }
-
-    List<Plan> getPlanes() {
-        return planAssoc
-            .stream()
-            .map(plan -> {
-                plan.plan
-            })
-            .collect()
-    }
 }
