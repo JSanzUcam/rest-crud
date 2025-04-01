@@ -44,12 +44,10 @@ class AlumnoController {
         AlumnoDTO respuestaDto = alumnoService.save(entradaDto).get()
         ResponseEntity.ok(respuestaDto)
     }
-
     // [R]ead
     @GetMapping
     @ResponseBody ResponseEntity<?> get(
         @RequestParam(name = "id", required = false) Integer id,
-        @RequestParam(name = "numeroDocumento", required = false) String numeroDocumento,
         @RequestParam(name = 'completo', required = false) boolean completo
     ) {
         // Si no estamos buscando nada mostramos todo.
@@ -64,25 +62,10 @@ class AlumnoController {
             return ResponseEntity.ok(optAlumno.get())
         }
     }
-    @GetMapping("/buscar")
-    @ResponseBody List<AlumnoDTO> search(@RequestParam("nombre") String nombre) {
-        return alumnoService.findWithNameContaining(nombre)
-    }
-    /**
-     * Demuestra el uso de @JsonIgnore desde la entidad.
-     * Este método devuelve los alumnos sin sus correos o planes
-     *
-     * @return todos los alumnos como entidades, no como DTO.
-     */
-    @GetMapping("/test-ignore")
-    @ResponseBody Iterable<Alumno> getAllRaw() {
-        return alumnoService.getAllRaw()
-    }
-
     // [U]pdate
     @PutMapping
     @ResponseBody ResponseEntity<?> update(
-        @Valid @RequestBody AlumnoDTO dto
+            @Valid @RequestBody AlumnoDTO dto
     ) {
         if (dto.id == null) {
             return ResponseEntity.badRequest().build()
@@ -95,20 +78,6 @@ class AlumnoController {
             return ResponseEntity.ok(alumnoOpt.get())
         }
     }
-    @PutMapping("/plan")
-    @ResponseBody ResponseEntity<?> addPlan(
-        @RequestParam("id") Integer alumnoId,
-        @RequestBody PlanCursoDTO plan
-    ) {
-        Optional<AlumnoFullDTO> alumno = alumnoService.addPlan(alumnoId, plan)
-
-        if (alumno.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok(alumno.get())
-        }
-    }
-
     // [D]elete
     @DeleteMapping
     @ResponseBody ResponseEntity<?> delete(@RequestParam("id") Integer id) {
@@ -118,20 +87,26 @@ class AlumnoController {
             return ResponseEntity.ok("Eliminado correctamente")
         }
     }
-    @DeleteMapping("/plan")
-    @ResponseBody ResponseEntity<?> removePlan(
-        @RequestParam('id') Integer id,
-        @RequestBody PlanCursoDTO plan
-    ) {
-        if (!alumnoService.removePlan(id, plan)) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok("Eliminado correctamente")
-        }
+
+    // BUSCAR
+    @GetMapping("/buscar")
+    @ResponseBody List<AlumnoDTO> search(@RequestParam("nombre") String nombre) {
+        return alumnoService.findWithNameContaining(nombre)
+    }
+
+    /**
+     * Demuestra el uso de @JsonIgnore desde la entidad.
+     * Este método devuelve los alumnos sin sus correos o planes
+     *
+     * @return todos los alumnos como entidades, no como DTO.
+     */
+    @GetMapping("/test-ignore")
+    @ResponseBody Iterable<Alumno> getAllRaw() {
+        return alumnoService.getAllRaw()
     }
 
     // CORREO
-    @PostMapping("/correo")
+    @PostMapping("/correos")
     @ResponseBody ResponseEntity<?> createCorreo(
             @RequestParam('id') Integer alumnoId,
             @Valid @RequestBody CorreoAltaDTO body
@@ -143,13 +118,39 @@ class AlumnoController {
             return ResponseEntity.ok(res.get())
         }
     }
-    @GetMapping("/correo")
+    @GetMapping("/correos")
     @ResponseBody ResponseEntity<?> getCorreoFromAlumno(@RequestParam('id') Integer alumnoId) {
         Optional<List<CorreoDTO>> listaCorreos = correoService.getByUserId(alumnoId)
         if (listaCorreos.isEmpty()) {
             return ResponseEntity.notFound().build()
         } else {
             return ResponseEntity.ok(listaCorreos.get())
+        }
+    }
+
+    // CURSOS
+    @PutMapping("/cursos")
+    @ResponseBody ResponseEntity<?> addPlan(
+            @RequestParam("id") Integer alumnoId,
+            @RequestBody PlanCursoDTO plan
+    ) {
+        Optional<AlumnoFullDTO> alumno = alumnoService.addPlan(alumnoId, plan)
+
+        if (alumno.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok(alumno.get())
+        }
+    }
+    @DeleteMapping("/cursos")
+    @ResponseBody ResponseEntity<?> removePlan(
+            @RequestParam('id') Integer id,
+            @RequestBody PlanCursoDTO plan
+    ) {
+        if (!alumnoService.removePlan(id, plan)) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok("Eliminado correctamente")
         }
     }
 
