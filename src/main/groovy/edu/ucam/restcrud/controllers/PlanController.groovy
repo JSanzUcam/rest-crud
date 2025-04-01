@@ -25,11 +25,20 @@ class PlanController {
     }
 
     @GetMapping
-    List<PlanDTO> getAll(
-        @RequestParam(name = "alumnos", required = false) boolean incluirAlumnos,
-        @RequestParam(name = "completo", required = false) boolean alumnosCompletos
+    ResponseEntity<?> get(
+        @RequestParam(name = "id", required = false) Integer id,
+        @RequestParam(name = "alumnos", required = false) boolean incluirAlumnos
     ) {
-        return planService.getAll(incluirAlumnos, alumnosCompletos)
+        if (id != null) {
+            Optional<PlanDTO> plan = planService.get(id, incluirAlumnos)
+            if (plan.isEmpty()) {
+                return ResponseEntity.notFound().build()
+            } else {
+                return ResponseEntity.ok(plan.get())
+            }
+        } else {
+            return ResponseEntity.ok(planService.getAll(incluirAlumnos))
+        }
     }
 
     @PutMapping

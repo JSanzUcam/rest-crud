@@ -31,7 +31,22 @@ class PlanService {
         return new PlanDTO(plan)
     }
 
-    List<PlanDTO> getAll(boolean alumnos = false, boolean completo = false) {
+    Optional<PlanDTO> get(Integer id, boolean alumnos = false) {
+        def now = Year.now().getValue()
+        Optional<Plan> plan = planRepository.findByIdAndBorrarEnIsNullOrBorrarEnGreaterThan(id, (short)now)
+        // Si no hay nada salir
+        if (plan.isEmpty()) {
+            return Optional.empty()
+        }
+        // Devolver un DTO u otro dependiendo de si queremos alumnos o no
+        if (alumnos) {
+            return Optional.of(new PlanFullDTO(plan.get()))
+        } else {
+            return Optional.of(new PlanDTO(plan.get()))
+        }
+    }
+
+    List<PlanDTO> getAll(boolean alumnos = false) {
         def now = Year.now().getValue()
         List<Plan> planes = planRepository.findByBorrarEnIsNullOrBorrarEnGreaterThan((short)now)
         // Convertir Planes en DTOs con parámetros opcionales (alumnos? correos de los alumnos?)
@@ -39,7 +54,7 @@ class PlanService {
             .stream()
             .map(plan -> {
                 if (alumnos) {
-                    return new PlanFullDTO(plan, completo)
+                    return new PlanFullDTO(plan)
                 } else {
                     return new PlanDTO(plan)
                 }
