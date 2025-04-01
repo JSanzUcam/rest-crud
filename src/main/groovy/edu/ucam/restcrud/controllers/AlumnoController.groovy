@@ -37,8 +37,10 @@ class AlumnoController {
     // [C]reate
     @PostMapping
     @ResponseBody ResponseEntity<AlumnoDTO> create(@Valid @RequestBody AlumnoDTO entradaDto) {
-        // Nos aseguramos de que no estamos modificando ningún alumno existente
-        entradaDto.id = null
+        // Nos aseguramos de que no estamos intentando modificar ningún alumno
+        if (entradaDto.id != null) {
+            return ResponseEntity.badRequest().build()
+        }
         AlumnoDTO respuestaDto = alumnoService.save(entradaDto).get()
         ResponseEntity.ok(respuestaDto)
     }
@@ -50,18 +52,12 @@ class AlumnoController {
         @RequestParam(name = "numeroDocumento", required = false) String numeroDocumento,
         @RequestParam(name = 'completo', required = false) boolean completo
     ) {
-        // Si no estamos buscando por ID o Número de Documento mostramos todo.
-        if (!(id || numeroDocumento)) {
+        // Si no estamos buscando nada mostramos todo.
+        if (!id) {
             return ResponseEntity.ok(alumnoService.getAll(completo))
         }
 
-        Optional<AlumnoDTO> optAlumno
-        if (id) {
-            optAlumno = alumnoService.get(id, completo)
-        } else {
-            optAlumno = alumnoService.get(numeroDocumento, completo)
-        }
-
+        Optional<AlumnoDTO> optAlumno = alumnoService.get(id, completo)
         if (optAlumno.empty) {
             return ResponseEntity.notFound().build()
         } else {
