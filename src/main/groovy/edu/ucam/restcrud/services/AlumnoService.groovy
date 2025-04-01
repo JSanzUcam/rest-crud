@@ -33,17 +33,10 @@ class AlumnoService {
     Optional<AlumnoDTO> save(@Valid AlumnoDTO alumnoDto) {
         Alumno alumno
         if (alumnoDto.id == null) {
-            // INFO: Groovy da un aviso aquí a pesar de que si que estemos usando
-            //       esta asignación. Pasa lo mismo en la siguiente
-            //noinspection GroovyUnusedAssignment
             alumno = new Alumno()
         } else if (alumnoRepository.existsById(alumnoDto.id)) {
-            //noinspection GroovyUnusedAssignment
             alumno = alumnoRepository.findById(alumnoDto.id).get()
-        }
-
-        // Si no se ha encontrado el alumno devolvemos empty
-        if (alumno == null) {
+        } else {
             return Optional.empty()
         }
 
