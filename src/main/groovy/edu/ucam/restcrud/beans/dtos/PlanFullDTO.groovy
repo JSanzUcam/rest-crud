@@ -2,11 +2,12 @@ package edu.ucam.restcrud.beans.dtos
 
 import edu.ucam.restcrud.database.entities.Plan
 
-class PlanAlumnosDTO extends PlanDTO {
+// TODO: AlumnoPlan FULL
+class PlanFullDTO extends PlanCursoDTO {
     List<AlumnoDTO> alumnos
 
-    PlanAlumnosDTO(Plan p, boolean correos = false) {
-        super(p)
+    PlanFullDTO(Plan p, boolean correos = false) {
+        super(p, short(0))
         this.alumnos = p.alumnoAssoc
             .stream()
             .map(alumno -> {

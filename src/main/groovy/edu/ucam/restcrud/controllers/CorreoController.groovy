@@ -6,16 +6,15 @@ import edu.ucam.restcrud.services.CorreoService
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestController
 
-@Controller
+@RestController
 @RequestMapping(path = "/api/correos")
 class CorreoController {
     @Autowired
@@ -23,13 +22,13 @@ class CorreoController {
 
     // [R]ead
     @GetMapping
-    @ResponseBody Iterable<CorreoDTO> getAll() {
+    Iterable<CorreoDTO> getAll() {
         return correoService.getAll()
     }
 
     // [U]pdate
     @PutMapping()
-    @ResponseBody ResponseEntity<?> updateById(
+    ResponseEntity<?> updateById(
         @RequestParam('id') Integer correoId,
         @Valid @RequestBody CorreoAltaDTO body
     ) {
@@ -43,7 +42,7 @@ class CorreoController {
 
     // [D]elete
     @DeleteMapping
-    @ResponseBody ResponseEntity<?> deleteById(@RequestParam('id') Integer correoId) {
+    ResponseEntity<?> deleteById(@RequestParam('id') Integer correoId) {
         if (!correoService.deleteById(correoId)) {
             return ResponseEntity.notFound().build()
         } else {

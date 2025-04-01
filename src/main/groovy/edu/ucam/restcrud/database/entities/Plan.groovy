@@ -25,6 +25,9 @@ class Plan {
     @Enumerated(EnumType.STRING)
     TipoEstudioEnum tipo
 
+    // Año de eliminación
+    Short borrarEn
+
     @OneToMany(
         fetch = FetchType.LAZY,
         mappedBy = "plan"
@@ -40,12 +43,12 @@ class Plan {
         this.id = id
     }
 
-    List<AlumnoPlan> getAlumnoAssoc() {
-        return alumnoAssoc
+    String getNombre() {
+        return nombre
     }
 
-    void setAlumnoAssoc(List<AlumnoPlan> alumnoAssoc) {
-        this.alumnoAssoc = alumnoAssoc
+    void setNombre(String nombre) {
+        this.nombre = nombre
     }
 
     TipoEstudioEnum getTipo() {
@@ -56,12 +59,20 @@ class Plan {
         this.tipo = tipo
     }
 
-    String getNombre() {
-        return nombre
+    Short getBorrarEn() {
+        return borrarEn
     }
 
-    void setNombre(String nombre) {
-        this.nombre = nombre
+    void setBorrarEn(Short borrarEn) {
+        this.borrarEn = borrarEn
+    }
+
+    List<AlumnoPlan> getAlumnoAssoc() {
+        return alumnoAssoc
+    }
+
+    void setAlumnoAssoc(List<AlumnoPlan> alumnoAssoc) {
+        this.alumnoAssoc = alumnoAssoc
     }
 
     List<Alumno> getAlumnos() {

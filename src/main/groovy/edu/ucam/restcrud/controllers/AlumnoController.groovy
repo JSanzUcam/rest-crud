@@ -14,7 +14,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -22,9 +21,9 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestController
 
-@Controller
+@RestController
 @RequestMapping(path = "/api/alumnos")
 class AlumnoController {
     @Autowired
@@ -36,7 +35,7 @@ class AlumnoController {
 
     // [C]reate
     @PostMapping
-    @ResponseBody ResponseEntity<AlumnoDTO> create(@Valid @RequestBody AlumnoDTO entradaDto) {
+    ResponseEntity<AlumnoDTO> create(@Valid @RequestBody AlumnoDTO entradaDto) {
         // Nos aseguramos de que no estamos intentando modificar ningún alumno
         if (entradaDto.id != null) {
             return ResponseEntity.badRequest().build()
@@ -46,7 +45,7 @@ class AlumnoController {
     }
     // [R]ead
     @GetMapping
-    @ResponseBody ResponseEntity<?> get(
+    ResponseEntity<?> get(
         @RequestParam(name = "id", required = false) Integer id,
         @RequestParam(name = 'completo', required = false) boolean completo
     ) {
@@ -64,7 +63,7 @@ class AlumnoController {
     }
     // [U]pdate
     @PutMapping
-    @ResponseBody ResponseEntity<?> update(
+    ResponseEntity<?> update(
             @Valid @RequestBody AlumnoDTO dto
     ) {
         if (dto.id == null) {
@@ -80,7 +79,7 @@ class AlumnoController {
     }
     // [D]elete
     @DeleteMapping
-    @ResponseBody ResponseEntity<?> delete(@RequestParam("id") Integer id) {
+    ResponseEntity<?> delete(@RequestParam("id") Integer id) {
         if (!alumnoService.delete(id)) {
             return ResponseEntity.notFound().build()
         } else {
@@ -90,7 +89,7 @@ class AlumnoController {
 
     // BUSCAR
     @GetMapping("/buscar")
-    @ResponseBody List<AlumnoDTO> search(@RequestParam("nombre") String nombre) {
+    List<AlumnoDTO> search(@RequestParam("nombre") String nombre) {
         return alumnoService.findWithNameContaining(nombre)
     }
 
@@ -101,13 +100,13 @@ class AlumnoController {
      * @return todos los alumnos como entidades, no como DTO.
      */
     @GetMapping("/test-ignore")
-    @ResponseBody Iterable<Alumno> getAllRaw() {
+    Iterable<Alumno> getAllRaw() {
         return alumnoService.getAllRaw()
     }
 
     // CORREO
     @PostMapping("/correos")
-    @ResponseBody ResponseEntity<?> createCorreo(
+    ResponseEntity<?> createCorreo(
             @RequestParam('id') Integer alumnoId,
             @Valid @RequestBody CorreoAltaDTO body
     ) {
@@ -119,7 +118,7 @@ class AlumnoController {
         }
     }
     @GetMapping("/correos")
-    @ResponseBody ResponseEntity<?> getCorreoFromAlumno(@RequestParam('id') Integer alumnoId) {
+    ResponseEntity<?> getCorreoFromAlumno(@RequestParam('id') Integer alumnoId) {
         Optional<List<CorreoDTO>> listaCorreos = correoService.getByUserId(alumnoId)
         if (listaCorreos.isEmpty()) {
             return ResponseEntity.notFound().build()
@@ -130,7 +129,7 @@ class AlumnoController {
 
     // CURSOS
     @PutMapping("/cursos")
-    @ResponseBody ResponseEntity<?> addPlan(
+    ResponseEntity<?> addPlan(
             @RequestParam("id") Integer alumnoId,
             @RequestBody PlanCursoDTO plan
     ) {
@@ -143,7 +142,7 @@ class AlumnoController {
         }
     }
     @DeleteMapping("/cursos")
-    @ResponseBody ResponseEntity<?> removePlan(
+    ResponseEntity<?> removePlan(
             @RequestParam('id') Integer id,
             @RequestBody PlanCursoDTO plan
     ) {
@@ -156,7 +155,7 @@ class AlumnoController {
 
     // DEBUG: Nuke. Borra todos los contenidos de la tabla
     @DeleteMapping(path = "/nuke")
-    @ResponseBody void deleteAll() {
+    void deleteAll() {
         logger.warn("Datos de alumnos eliminados por completo")
         alumnoService.nuke()
     }

@@ -1,9 +1,8 @@
 package edu.ucam.restcrud.services
 
 
-import edu.ucam.restcrud.beans.dtos.PlanAlumnosDTO
+import edu.ucam.restcrud.beans.dtos.PlanFullDTO
 import edu.ucam.restcrud.beans.dtos.PlanDTO
-import edu.ucam.restcrud.database.entities.Alumno
 import edu.ucam.restcrud.database.entities.AlumnoPlan
 import edu.ucam.restcrud.database.entities.Plan
 import edu.ucam.restcrud.database.repositories.AlumnoPlanRepository
@@ -37,7 +36,7 @@ class PlanService {
             .stream()
             .map(plan -> {
                 if (alumnos) {
-                    return new PlanAlumnosDTO(plan, completo)
+                    return new PlanFullDTO(plan, completo)
                 } else {
                     return new PlanDTO(plan)
                 }
@@ -58,6 +57,15 @@ class PlanService {
         return Optional.of(new PlanDTO(plan))
     }
 
+    boolean logicDel(Integer id, Short borrarEn) {
+        Optional<Plan> plan = planRepository.findById(id)
+        if (plan.isEmpty()) {
+            return false
+        }
+
+        plan.get().setBorrarEn(borrarEn)
+        return true
+    }
     boolean delete(Integer id) {
         Optional<Plan> plan = planRepository.findById(id)
         if (plan.isEmpty()) {
@@ -71,7 +79,7 @@ class PlanService {
             }
         }
 
-        planRepository.deleteById(id)
+        planRepository.delete(plan.get())
         return true
     }
 }
