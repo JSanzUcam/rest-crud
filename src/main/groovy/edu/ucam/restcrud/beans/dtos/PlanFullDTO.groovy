@@ -7,7 +7,7 @@ class PlanFullDTO extends PlanCursoDTO {
     List<AlumnoDTO> alumnos
 
     PlanFullDTO(Plan p, boolean correos = false) {
-        super(p, short(0))
+        super(p, (short)0)
         this.alumnos = p.alumnoAssoc
             .stream()
             .map(alumno -> {
