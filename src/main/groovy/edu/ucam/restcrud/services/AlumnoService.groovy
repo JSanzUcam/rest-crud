@@ -1,9 +1,9 @@
 package edu.ucam.restcrud.services
 
-
-import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
+import edu.ucam.restcrud.beans.dtos.AlumnoConPlanesDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
-import edu.ucam.restcrud.beans.dtos.PlanCursoDTO
+import edu.ucam.restcrud.beans.dtos.AlumnoPlanAltaDTO
+
 import edu.ucam.restcrud.database.entities.Alumno
 import edu.ucam.restcrud.database.entities.AlumnoPlan
 import edu.ucam.restcrud.database.entities.Correo
@@ -64,11 +64,7 @@ class AlumnoService {
     List<AlumnoDTO> getAll(boolean completo = false) {
         List<Alumno> alumnos = alumnoRepository.findAll() as List<Alumno>
         return alumnos.stream().map(a -> {
-            if (completo) {
-                return new AlumnoFullDTO(a)
-            } else {
-                return new AlumnoDTO(a)
-            }
+            return new AlumnoDTO(a, completo)
         }).collect()
     }
 
@@ -97,18 +93,6 @@ class AlumnoService {
     }
 
     /**
-     * Devuelve el alumno con el Número de documento especificado
-     *
-     * @param numeroDocumento El Número de documento (único) del alumno
-     * @param completo Booleano indicando si se deben mostrar todos los datos
-     * @return un valor opcional con el alumno encontrado o nada
-     */
-    Optional<AlumnoDTO> get(String numeroDocumento, boolean completo = false) {
-        Optional<Alumno> alumno = alumnoRepository.findByNumeroDocumento(numeroDocumento)
-        return optionalDtoFromOptionalAlumno(alumno, completo)
-    }
-
-    /**
      * Busca en la base de datos los alumnos cuyo nombre contenga el nombre indicado
      *
      * @param substring La sección del nombre a buscar
@@ -120,11 +104,7 @@ class AlumnoService {
         return alumnos
             .stream()
             .map(alumno -> {
-                if (completo) {
-                    return new AlumnoFullDTO(alumno)
-                } else {
-                    return new AlumnoDTO(alumno)
-                }
+                return new AlumnoDTO(alumno, completo)
             })
             .collect()
     }
@@ -133,28 +113,21 @@ class AlumnoService {
      * Actualiza el alumno para asignarle un plan y un curso.
      *
      * @param id
-     * @param plan
      * @return
      */
-    Optional<AlumnoFullDTO> addPlan(Integer id, PlanCursoDTO plan) {
-        Optional<Alumno> optAlumno = alumnoRepository.findById(id)
+    Optional<AlumnoConPlanesDTO> addPlan(AlumnoPlanAltaDTO alumnoPlan) {
+        Optional<Alumno> optAlumno = alumnoRepository.findById(alumnoPlan.alumno_id)
         if (optAlumno.isEmpty()) {
             return Optional.empty()
         }
-        Optional<Plan> optPlan
-        if (plan.id != null) {
-            optPlan = planRepository.findById(plan.id)
-        } else if (plan.nombre != null) {
-            optPlan = planRepository.findByNombre(plan.nombre)
-        } else {
-            return Optional.empty()
-        }
-
-        return addOptionalPlan(optPlan, optAlumno.get(), plan.curso)
+        Optional<Plan> optPlan = planRepository.findById(alumnoPlan.plan_id)
+        return addOptionalPlan(optPlan, optAlumno.get(), alumnoPlan.curso)
     }
 
     /**
      * Elimina un alumno de la base de datos a partir de su ID
+     *
+     * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
      *
      * @param id Identificador único del alumno
      * @return true si se ha eliminado el alumno, false si no se ha eliminado
@@ -174,20 +147,19 @@ class AlumnoService {
         return true
     }
 
-    boolean removePlan(Integer id, PlanCursoDTO plan) {
-        if (plan.id == null || !alumnoRepository.existsById(id)) {
+    /**
+     * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
+     *
+     * @param alumnosPlanId
+     * @return
+     */
+    boolean removePlan(Integer alumnosPlanId) {
+        Optional<AlumnoPlan> alumnoPlan = alumnoPlanRepository.findById(alumnosPlanId)
+        if (alumnoPlan.isEmpty()) {
             return false
         }
-
-        Alumno alumno = alumnoRepository.findById(id).get()
-        boolean deleted = false
-        for (AlumnoPlan assoc : alumno.planAssoc) {
-            if (assoc.plan.id == plan.id && assoc.curso == plan.curso) {
-                deleted = true
-                alumnoPlanRepository.delete(assoc)
-            }
-        }
-        return deleted
+        alumnoPlanRepository.delete(alumnoPlan.get())
+        return true
     }
 
     /**
@@ -225,20 +197,16 @@ class AlumnoService {
     }
 
 
+    // TODO: Cambiar este nombre, wtf?
     private static Optional<AlumnoDTO> optionalDtoFromOptionalAlumno(Optional<Alumno> alumno, boolean completo = false) {
         if (alumno.empty) {
             return Optional.empty()
         }
 
-        AlumnoDTO alumnoDTO
-        if (completo) {
-            alumnoDTO = new AlumnoFullDTO(alumno.get())
-        } else {
-            alumnoDTO = new AlumnoDTO(alumno.get())
-        }
+        AlumnoDTO alumnoDTO = new AlumnoDTO(alumno.get(), completo)
         return Optional.of(alumnoDTO)
     }
-    private Optional<AlumnoFullDTO> addOptionalPlan(Optional<Plan> optPlan, Alumno alumno, short curso) {
+    private Optional<AlumnoConPlanesDTO> addOptionalPlan(Optional<Plan> optPlan, Alumno alumno, short curso) {
         if (optPlan.isEmpty()) {
             return Optional.empty()
         }
@@ -251,6 +219,6 @@ class AlumnoService {
         alumnoPlanRepository.save(assoc)
         alumno.planAssoc.add(assoc)
         alumnoRepository.save(alumno)
-        return Optional.of(new AlumnoFullDTO(alumno))
+        return Optional.of(new AlumnoConPlanesDTO(alumno))
     }
 }

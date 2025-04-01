@@ -1,11 +1,13 @@
 package edu.ucam.restcrud.controllers
 
+
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 
-import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
+
+import edu.ucam.restcrud.beans.dtos.AlumnoPlanAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoDTO
-import edu.ucam.restcrud.beans.dtos.PlanCursoDTO
+
 import edu.ucam.restcrud.database.entities.Alumno
 import edu.ucam.restcrud.services.AlumnoService
 import edu.ucam.restcrud.services.CorreoService
@@ -129,11 +131,8 @@ class AlumnoController {
 
     // CURSOS
     @PutMapping("/cursos")
-    ResponseEntity<?> addPlan(
-            @RequestParam("id") Integer alumnoId,
-            @RequestBody PlanCursoDTO plan
-    ) {
-        Optional<AlumnoFullDTO> alumno = alumnoService.addPlan(alumnoId, plan)
+    ResponseEntity<?> addPlan(@Valid @RequestBody AlumnoPlanAltaDTO alumnosPlan) {
+        Optional<AlumnoDTO> alumno = alumnoService.addPlan(alumnosPlan)
 
         if (alumno.isEmpty()) {
             return ResponseEntity.notFound().build()
@@ -142,11 +141,8 @@ class AlumnoController {
         }
     }
     @DeleteMapping("/cursos")
-    ResponseEntity<?> removePlan(
-            @RequestParam('id') Integer id,
-            @RequestBody PlanCursoDTO plan
-    ) {
-        if (!alumnoService.removePlan(id, plan)) {
+    ResponseEntity<?> removePlan(@RequestParam("id") Integer alumnoPlanId) {
+        if (!alumnoService.removePlan(alumnoPlanId)) {
             return ResponseEntity.notFound().build()
         } else {
             return ResponseEntity.ok("Eliminado correctamente")

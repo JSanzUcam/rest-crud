@@ -1,6 +1,6 @@
 package edu.ucam.restcrud.services
 
-import edu.ucam.restcrud.beans.dtos.AlumnoFullDTO
+import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoDTO
 import edu.ucam.restcrud.database.entities.Correo
@@ -61,7 +61,7 @@ class CorreoService {
      * @return Optional de una Lista de CorreosDTO
      */
     Optional<List<CorreoDTO>> getByUserId(Integer alumnoId) {
-        Optional<AlumnoFullDTO> alumno = alumnoService.get(alumnoId, true) as Optional<AlumnoFullDTO>
+        Optional<AlumnoDTO> alumno = alumnoService.get(alumnoId, true)
         if (alumno.isEmpty()) {
             return Optional.empty()
         }

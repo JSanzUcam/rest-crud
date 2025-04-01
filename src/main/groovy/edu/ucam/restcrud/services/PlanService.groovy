@@ -1,7 +1,7 @@
 package edu.ucam.restcrud.services
 
 
-import edu.ucam.restcrud.beans.dtos.PlanFullDTO
+import edu.ucam.restcrud.beans.dtos.PlanConAlumnosDTO
 import edu.ucam.restcrud.beans.dtos.PlanDTO
 import edu.ucam.restcrud.database.entities.AlumnoPlan
 import edu.ucam.restcrud.database.entities.Plan
@@ -40,7 +40,7 @@ class PlanService {
         }
         // Devolver un DTO u otro dependiendo de si queremos alumnos o no
         if (alumnos) {
-            return Optional.of(new PlanFullDTO(plan.get()))
+            return Optional.of(new PlanConAlumnosDTO(plan.get()))
         } else {
             return Optional.of(new PlanDTO(plan.get()))
         }
@@ -54,7 +54,7 @@ class PlanService {
             .stream()
             .map(plan -> {
                 if (alumnos) {
-                    return new PlanFullDTO(plan)
+                    return new PlanConAlumnosDTO(plan)
                 } else {
                     return new PlanDTO(plan)
                 }

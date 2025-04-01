@@ -1,6 +1,8 @@
 package edu.ucam.restcrud.beans.dtos
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
 import edu.ucam.restcrud.beans.enums.TipoDocumentoEnum
 import edu.ucam.restcrud.beans.validators.DocumentFormat
 import edu.ucam.restcrud.database.entities.Alumno
@@ -10,6 +12,7 @@ import jakarta.validation.constraints.Past
 import java.time.Instant
 
 @DocumentFormat // Validador DNI/NIE/Pasaporte
+@JsonIgnoreProperties(ignoreUnknown = true)
 class AlumnoDTO {
     Integer id
 
@@ -17,9 +20,12 @@ class AlumnoDTO {
     TipoDocumentoEnum tipoDocumento
     @NotNull
     String numeroDocumento
-
     @NotNull
     String nombreCompleto
+
+    // Solo se muestra cuando pedimos que se muestre todo desde el constructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    List<CorreoDTO> correos
 
     @Past(message = "La fecha de nacimiento no puede ser futura")
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -32,12 +38,31 @@ class AlumnoDTO {
         nombreCompleto = "default"
         fechaNacimiento = Date.from(Instant.EPOCH)
     }
-    AlumnoDTO(Alumno a) {
+    AlumnoDTO(Alumno a, boolean completo = false) {
         this.id = a.id
         this.tipoDocumento = a.tipoDocumento
         this.numeroDocumento = a.numeroDocumento
         this.nombreCompleto = a.nombreCompleto
         this.fechaNacimiento = a.fechaNacimiento
+
+        if (completo) {
+            this.correos = a.correos
+                .stream()
+                .map(correo -> {
+                    return new CorreoDTO(correo)
+                })
+                .collect()
+        } else {
+            this.correos = null
+        }
+    }
+
+    Integer getId() {
+        return id
+    }
+
+    void setId(Integer id) {
+        this.id = id
     }
 
     TipoDocumentoEnum getTipoDocumento() {
@@ -56,20 +81,20 @@ class AlumnoDTO {
         this.numeroDocumento = numeroDocumento
     }
 
-    Integer getId() {
-        return id
-    }
-
-    void setId(Integer id) {
-        this.id = id
-    }
-
     String getNombreCompleto() {
         return nombreCompleto
     }
 
     void setNombreCompleto(String nombreCompleto) {
         this.nombreCompleto = nombreCompleto
+    }
+
+    List<CorreoDTO> getCorreos() {
+        return correos
+    }
+
+    void setCorreos(List<CorreoDTO> correos) {
+        this.correos = correos
     }
 
     Date getFechaNacimiento() {
