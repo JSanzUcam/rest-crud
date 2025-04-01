@@ -11,6 +11,8 @@ import edu.ucam.restcrud.database.repositories.PlanRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
+import java.time.Year
+
 @Service
 class PlanService {
     @Autowired
@@ -30,7 +32,8 @@ class PlanService {
     }
 
     List<PlanDTO> getAll(boolean alumnos = false, boolean completo = false) {
-        List<Plan> planes = planRepository.findAll() as List<Plan>
+        def now = Year.now().getValue()
+        List<Plan> planes = planRepository.findByBorrarEnIsNullOrBorrarEnGreaterThan((short)now)
         // Convertir Planes en DTOs con parámetros opcionales (alumnos? correos de los alumnos?)
         List<PlanDTO> planesDto = planes
             .stream()
@@ -57,6 +60,18 @@ class PlanService {
         return Optional.of(new PlanDTO(plan))
     }
 
+    /**
+     * Realiza un borrado lógico sobre un plan en concreto.
+     * Esto hace que no sea posible que un alumno se matricule de un plan
+     * que supuestamente está eliminado, mientras que los alumnos que ya
+     * hayan cursado el plan sigan manteniendo su historial
+     *
+     * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
+     *
+     * @param id ID del plan a eliminar
+     * @param borrarEn Nuevo año de eliminación
+     * @return false si no se encuentra el plan, true en caso contrario
+     */
     boolean logicDel(Integer id, Short borrarEn) {
         Optional<Plan> plan = planRepository.findById(id)
         if (plan.isEmpty()) {
@@ -64,8 +79,21 @@ class PlanService {
         }
 
         plan.get().setBorrarEn(borrarEn)
+        planRepository.save(plan.get())
         return true
     }
+
+    /**
+     * Elimina el plan de la base de datos, eliminando registros de alumnos
+     * teniendo este plan en el proceso.
+     *
+     * Usa logicDel() para realizar un borrado lógico
+     *
+     * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
+     *
+     * @param id - ID del plan a eliminar
+     * @return true si se elimina, false si no
+     */
     boolean delete(Integer id) {
         Optional<Plan> plan = planRepository.findById(id)
         if (plan.isEmpty()) {

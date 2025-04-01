@@ -42,8 +42,11 @@ class PlanController {
     }
 
     @DeleteMapping
-    ResponseEntity<?> delete(@RequestParam("id") Integer id) {
-        if (!planService.delete(id)) {
+    ResponseEntity<?> delete(
+        @RequestParam("id") Integer id,
+        @RequestParam("borrar_en") Short borrarEn
+    ) {
+        if (!planService.logicDel(id, borrarEn)) {
             return ResponseEntity.notFound().build()
         } else {
             return ResponseEntity.ok().build()
