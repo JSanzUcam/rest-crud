@@ -32,11 +32,16 @@ class AlumnoService {
      */
     Optional<AlumnoDTO> save(@Valid AlumnoDTO alumnoDto) {
         Alumno alumno
+        // Crear
         if (alumnoDto.id == null) {
             alumno = new Alumno()
-        } else if (alumnoRepository.existsById(alumnoDto.id)) {
+        }
+        // Editar
+        else if (alumnoRepository.existsById(alumnoDto.id)) {
             alumno = alumnoRepository.findById(alumnoDto.id).get()
-        } else {
+        }
+        // Error (editar alumno no encontrado)
+        else {
             return Optional.empty()
         }
 
@@ -45,7 +50,7 @@ class AlumnoService {
         alumno.setNombreCompleto(alumnoDto.getNombreCompleto())
         alumno.setFechaNacimiento(alumnoDto.getFechaNacimiento())
         alumnoRepository.save(alumno)
-        return Optional.of(new AlumnoDTO(alumno))
+        return Optional.of(toDto(alumno))
     }
 
     /**
@@ -55,10 +60,8 @@ class AlumnoService {
      * @return Lista de datos de alumnos
      */
     List<AlumnoDTO> getAll(boolean completo = false) {
-        List<Alumno> alumnos = alumnoRepository.findAll() as List<Alumno>
-        return alumnos.stream().map(a -> {
-            return new AlumnoDTO(a, completo)
-        }).collect()
+        Iterable<Alumno> alumnos = alumnoRepository.findAll()
+        return toDto(alumnos, completo)
     }
 
     /**
@@ -82,7 +85,8 @@ class AlumnoService {
      */
     Optional<AlumnoDTO> get(Integer id, boolean completo = false) {
         Optional<Alumno> alumno = alumnoRepository.findById(id)
-        return optionalDtoFromOptionalAlumno(alumno, completo)
+        // Recibe un Optional, devuelve un Optional
+        return toDto(alumno, completo)
     }
 
     /**
@@ -93,13 +97,8 @@ class AlumnoService {
      * @return List<AlumnoDTO> con los alumnos cuyo nombre contenga `substring`
      */
     List<AlumnoDTO> search(String substring, boolean completo = false) {
-        List<Alumno> alumnos = alumnoRepository.findAllByNombreCompletoIgnoreCaseContaining(substring) as List<Alumno>
-        return alumnos
-            .stream()
-            .map(alumno -> {
-                return new AlumnoDTO(alumno, completo)
-            })
-            .collect()
+        Iterable<Alumno> alumnos = alumnoRepository.findAllByNombreCompletoIgnoreCaseContaining(substring)
+        return toDto(alumnos, completo)
     }
 
     /**
@@ -109,12 +108,13 @@ class AlumnoService {
      * @return true si se ha eliminado el alumno, false si no se ha eliminado
      */
     boolean delete(Integer id) {
-        if (alumnoRepository.findById(id).empty) {
+        Optional<Alumno> optAlumno = alumnoRepository.findById(id)
+        if (optAlumno.isEmpty()) {
             return false
         }
 
         // Borrar todos los registros de cursos para este alumno
-        Alumno alumno = alumnoRepository.findById(id).get()
+        Alumno alumno = optAlumno.get()
         for (AlumnoPlan assoc : alumno.planAssoc) {
             alumnoPlanRepository.delete(assoc)
         }
@@ -136,11 +136,20 @@ class AlumnoService {
         }
 
         Optional<Alumno> optAlumno = alumnoRepository.findById(alumnoPlan.alumno_id)
-        if (optAlumno.isEmpty()) {
+        Optional<Plan> optPlan = planRepository.findById(alumnoPlan.plan_id)
+        if (optPlan.isEmpty() || optAlumno.isEmpty()) {
             return Optional.empty()
         }
-        Optional<Plan> optPlan = planRepository.findById(alumnoPlan.plan_id)
-        return addOptionalPlan(optPlan, optAlumno.get(), alumnoPlan.curso)
+
+        Alumno alumno = optAlumno.get()
+
+        AlumnoPlan assoc = new AlumnoPlan()
+        assoc.alumno = alumno
+        assoc.plan = optPlan.get()
+        assoc.curso = alumnoPlan.curso
+
+        alumnoPlanRepository.save(assoc)
+        return Optional.of(new AlumnoConPlanesDTO(alumno))
     }
 
     Optional<AlumnoConPlanesDTO> getPlanes(Integer alumnoId) {
@@ -213,8 +222,6 @@ class AlumnoService {
         alumno.get().correos.add(correo)
     }
 
-
-
     /**
      * DEBUG:
      * Borra todos los contenidos de la tabla
@@ -223,29 +230,22 @@ class AlumnoService {
         alumnoRepository.deleteAll()
     }
 
-
-    // TODO: Cambiar este nombre, wtf?
-    private static Optional<AlumnoDTO> optionalDtoFromOptionalAlumno(Optional<Alumno> alumno, boolean completo = false) {
-        if (alumno.empty) {
-            return Optional.empty()
-        }
-
-        AlumnoDTO alumnoDTO = new AlumnoDTO(alumno.get(), completo)
-        return Optional.of(alumnoDTO)
+    // TO DTO
+    private static List<AlumnoDTO> toDto(List<Alumno> a, boolean completo = false) {
+        a.stream().map(alumno -> {
+            return new AlumnoDTO(alumno, completo)
+        }).collect()
     }
-    private Optional<AlumnoConPlanesDTO> addOptionalPlan(Optional<Plan> optPlan, Alumno alumno, short curso) {
-        if (optPlan.isEmpty()) {
+    private static List<AlumnoDTO> toDto(Iterable<Alumno> a, boolean completo = false) {
+        return toDto(a as List<Alumno>, completo)
+    }
+    private static AlumnoDTO toDto(Alumno a, boolean completo = false) {
+        return new AlumnoDTO(a, completo)
+    }
+    private static Optional<AlumnoDTO> toDto(Optional<Alumno> a, boolean completo = false) {
+        if (a.isEmpty()) {
             return Optional.empty()
         }
-
-        AlumnoPlan assoc = new AlumnoPlan()
-        assoc.alumno = alumno
-        assoc.plan = optPlan.get()
-        assoc.curso = curso
-
-        alumnoPlanRepository.save(assoc)
-        alumno.planAssoc.add(assoc)
-        alumnoRepository.save(alumno)
-        return Optional.of(new AlumnoConPlanesDTO(alumno))
+        Optional.of(new AlumnoDTO(a.get(), completo))
     }
 }
