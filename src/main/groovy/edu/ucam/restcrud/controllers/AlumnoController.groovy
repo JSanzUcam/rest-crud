@@ -92,7 +92,7 @@ class AlumnoController {
     // BUSCAR
     @GetMapping("/buscar")
     List<AlumnoDTO> search(@RequestParam("nombre") String nombre) {
-        return alumnoService.findWithNameContaining(nombre)
+        return alumnoService.search(nombre)
     }
 
     /**
@@ -120,7 +120,7 @@ class AlumnoController {
         }
     }
     @GetMapping("/correos")
-    ResponseEntity<?> getCorreoFromAlumno(@RequestParam('id') Integer alumnoId) {
+    ResponseEntity<?> getCorreos(@RequestParam('id') Integer alumnoId) {
         Optional<List<CorreoDTO>> listaCorreos = correoService.getByUserId(alumnoId)
         if (listaCorreos.isEmpty()) {
             return ResponseEntity.notFound().build()
@@ -131,8 +131,8 @@ class AlumnoController {
 
     // CURSOS
     @PostMapping("/cursos")
-    ResponseEntity<?> addPlan(@Valid @RequestBody AlumnoPlanAltaDTO alumnosPlan) {
-        Optional<AlumnoDTO> alumno = alumnoService.addPlan(alumnosPlan)
+    ResponseEntity<?> addPlan(@Valid @RequestBody AlumnoPlanAltaDTO alumnoPlan) {
+        Optional<AlumnoDTO> alumno = alumnoService.addPlan(alumnoPlan)
 
         if (alumno.isEmpty()) {
             return ResponseEntity.notFound().build()
@@ -141,15 +141,23 @@ class AlumnoController {
         }
     }
     @GetMapping("/cursos")
-    ResponseEntity<?> getPlans(@RequestParam("id") Integer alumnoId) {
-        Optional<AlumnoConPlanesDTO> planes = alumnoService.getPlanesFromAlumno(alumnoId)
+    ResponseEntity<?> getPlanes(@RequestParam("id") Integer alumnoId) {
+        Optional<AlumnoConPlanesDTO> planes = alumnoService.getPlanes(alumnoId)
         if (planes.isEmpty()) {
             return ResponseEntity.notFound().build()
         } else {
             return ResponseEntity.ok(planes.get())
         }
     }
-    // TODO: Implementar PUT para cursos en alumnos
+    @PutMapping("/cursos")
+    ResponseEntity<?> updatePlan(@Valid @RequestBody AlumnoPlanAltaDTO alumnoPlan) {
+        Optional<AlumnoDTO> alumno = alumnoService.updatePlan(alumnoPlan)
+        if (alumno.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok(alumno.get())
+        }
+    }
     @DeleteMapping("/cursos")
     ResponseEntity<?> removePlan(@RequestParam("id") Integer alumnoPlanId) {
         if (!alumnoService.removePlan(alumnoPlanId)) {

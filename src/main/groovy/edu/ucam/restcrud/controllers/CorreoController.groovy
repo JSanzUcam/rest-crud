@@ -29,7 +29,7 @@ class CorreoController {
     }
     // [U]pdate
     @PutMapping()
-    ResponseEntity<?> updateById(
+    ResponseEntity<?> update(
         @RequestParam('id') Integer correoId,
         @Valid @RequestBody CorreoAltaDTO body
     ) {
@@ -42,8 +42,8 @@ class CorreoController {
     }
     // [D]elete
     @DeleteMapping
-    ResponseEntity<?> deleteById(@RequestParam('id') Integer correoId) {
-        if (!correoService.deleteById(correoId)) {
+    ResponseEntity<?> delete(@RequestParam('id') Integer correoId) {
+        if (!correoService.delete(correoId)) {
             return ResponseEntity.notFound().build()
         } else {
             return ResponseEntity.ok("Eliminado correctamente")

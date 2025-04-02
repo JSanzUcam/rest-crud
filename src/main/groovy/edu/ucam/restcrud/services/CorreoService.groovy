@@ -93,7 +93,7 @@ class CorreoService {
      * @param id la ID del correo a eliminar
      * @return true si se ha eliminado, false si no se encontró el correo
      */
-    boolean deleteById(Integer id) {
+    boolean delete(Integer id) {
         if (correoRepository.findById(id).empty) {
             return false
         }

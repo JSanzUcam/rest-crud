@@ -81,8 +81,6 @@ class PlanService {
      * que supuestamente está eliminado, mientras que los alumnos que ya
      * hayan cursado el plan sigan manteniendo su historial
      *
-     * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
-     *
      * @param id ID del plan a eliminar
      * @param borrarEn Nuevo año de eliminación
      * @return false si no se encuentra el plan, true en caso contrario
@@ -103,8 +101,6 @@ class PlanService {
      * teniendo este plan en el proceso.
      *
      * Usa logicDel() para realizar un borrado lógico
-     *
-     * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
      *
      * @param id - ID del plan a eliminar
      * @return true si se elimina, false si no

@@ -3,12 +3,21 @@ package edu.ucam.restcrud.beans.dtos
 import jakarta.validation.constraints.NotNull
 
 class AlumnoPlanAltaDTO {
-    @NotNull
+    Integer id
+
     Integer alumno_id
     @NotNull
     Integer plan_id
     @NotNull
     Short curso
+
+    Integer getId() {
+        return id
+    }
+
+    void setId(Integer id) {
+        this.id = id
+    }
 
     Integer getAlumno_id() {
         return alumno_id

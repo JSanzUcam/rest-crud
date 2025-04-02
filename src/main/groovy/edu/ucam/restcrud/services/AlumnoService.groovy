@@ -92,7 +92,7 @@ class AlumnoService {
      * @param completo Booleano indicando si se deben mostrar todos los datos
      * @return List<AlumnoDTO> con los alumnos cuyo nombre contenga `substring`
      */
-    List<AlumnoDTO> findWithNameContaining(String substring, boolean completo = false) {
+    List<AlumnoDTO> search(String substring, boolean completo = false) {
         List<Alumno> alumnos = alumnoRepository.findAllByNombreCompletoIgnoreCaseContaining(substring) as List<Alumno>
         return alumnos
             .stream()
@@ -104,8 +104,6 @@ class AlumnoService {
 
     /**
      * Elimina un alumno de la base de datos a partir de su ID
-     *
-     * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
      *
      * @param id Identificador único del alumno
      * @return true si se ha eliminado el alumno, false si no se ha eliminado
@@ -132,16 +130,20 @@ class AlumnoService {
      * @return
      */
     Optional<AlumnoConPlanesDTO> addPlan(AlumnoPlanAltaDTO alumnoPlan) {
+        // Necesitamos que la ID de la relación sea NULL pero que la del alumno NO sea NULL
+        if (alumnoPlan.id != null || alumnoPlan.alumno_id == null) {
+            return Optional.empty()
+        }
+
         Optional<Alumno> optAlumno = alumnoRepository.findById(alumnoPlan.alumno_id)
         if (optAlumno.isEmpty()) {
             return Optional.empty()
         }
         Optional<Plan> optPlan = planRepository.findById(alumnoPlan.plan_id)
-        // TODO: Llamar getPlanesFromAlumno() después de añadir
         return addOptionalPlan(optPlan, optAlumno.get(), alumnoPlan.curso)
     }
 
-    Optional<AlumnoConPlanesDTO> getPlanesFromAlumno(Integer alumnoId) {
+    Optional<AlumnoConPlanesDTO> getPlanes(Integer alumnoId) {
         Optional<Alumno> alumno = alumnoRepository.findById(alumnoId)
         if (alumno.isEmpty()) {
             return Optional.empty()
@@ -149,9 +151,28 @@ class AlumnoService {
         return Optional.of(new AlumnoConPlanesDTO(alumno.get()))
     }
 
+    Optional<AlumnoConPlanesDTO> updatePlan(AlumnoPlanAltaDTO alumnoPlanDto) {
+        // Queremos modificar por ID de la relación, necesitamos que la ID del alumno SEA NULL
+        if (alumnoPlanDto.id == null || alumnoPlanDto.alumno_id != null) {
+            return Optional.empty()
+        }
+
+        Optional<AlumnoPlan> optAlumnoPlan = alumnoPlanRepository.findById(alumnoPlanDto.id)
+        Optional<Plan> optPlan = planRepository.findById(alumnoPlanDto.plan_id)
+        if (optAlumnoPlan.isEmpty() || optPlan.isEmpty()) {
+            return Optional.empty()
+        }
+
+        AlumnoPlan alumnoPlan = optAlumnoPlan.get()
+
+        alumnoPlan.curso = alumnoPlanDto.curso
+        alumnoPlan.plan = optPlan.get()
+        alumnoPlanRepository.save(alumnoPlan)
+
+        return Optional.of(new AlumnoConPlanesDTO(alumnoPlan.alumno))
+    }
+
     /**
-     * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
-     *
      * @param alumnosPlanId
      * @return
      */
@@ -175,6 +196,8 @@ class AlumnoService {
     }
 
     /**
+     * LLAMADO DESDE EL SERVICIO DE CORREO
+     * ===================================
      * Añade un nuevo correo al alumno. Esto no guarda el correo
      * en la base de datos
      *
