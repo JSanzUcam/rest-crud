@@ -1,6 +1,6 @@
 package edu.ucam.restcrud.controllers
 
-
+import edu.ucam.restcrud.beans.dtos.AlumnoConPlanesDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 
 
@@ -130,7 +130,7 @@ class AlumnoController {
     }
 
     // CURSOS
-    @PutMapping("/cursos")
+    @PostMapping("/cursos")
     ResponseEntity<?> addPlan(@Valid @RequestBody AlumnoPlanAltaDTO alumnosPlan) {
         Optional<AlumnoDTO> alumno = alumnoService.addPlan(alumnosPlan)
 
@@ -140,6 +140,16 @@ class AlumnoController {
             return ResponseEntity.ok(alumno.get())
         }
     }
+    @GetMapping("/cursos")
+    ResponseEntity<?> getPlans(@RequestParam("id") Integer alumnoId) {
+        Optional<AlumnoConPlanesDTO> planes = alumnoService.getPlanesFromAlumno(alumnoId)
+        if (planes.isEmpty()) {
+            return ResponseEntity.notFound().build()
+        } else {
+            return ResponseEntity.ok(planes.get())
+        }
+    }
+    // TODO: Implementar PUT para cursos en alumnos
     @DeleteMapping("/cursos")
     ResponseEntity<?> removePlan(@RequestParam("id") Integer alumnoPlanId) {
         if (!alumnoService.removePlan(alumnoPlanId)) {

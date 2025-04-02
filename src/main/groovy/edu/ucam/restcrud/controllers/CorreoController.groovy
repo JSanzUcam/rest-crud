@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+// TODO: RestControllerAdvice para control de errores global
+
 @RestController
 @RequestMapping(path = "/api/correos")
 class CorreoController {
@@ -25,7 +27,6 @@ class CorreoController {
     Iterable<CorreoDTO> getAll() {
         return correoService.getAll()
     }
-
     // [U]pdate
     @PutMapping()
     ResponseEntity<?> updateById(
@@ -39,7 +40,6 @@ class CorreoController {
             return ResponseEntity.ok(newCorreo.get())
         }
     }
-
     // [D]elete
     @DeleteMapping
     ResponseEntity<?> deleteById(@RequestParam('id') Integer correoId) {

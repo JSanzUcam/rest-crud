@@ -103,21 +103,6 @@ class AlumnoService {
     }
 
     /**
-     * Actualiza el alumno para asignarle un plan y un curso.
-     *
-     * @param id
-     * @return
-     */
-    Optional<AlumnoConPlanesDTO> addPlan(AlumnoPlanAltaDTO alumnoPlan) {
-        Optional<Alumno> optAlumno = alumnoRepository.findById(alumnoPlan.alumno_id)
-        if (optAlumno.isEmpty()) {
-            return Optional.empty()
-        }
-        Optional<Plan> optPlan = planRepository.findById(alumnoPlan.plan_id)
-        return addOptionalPlan(optPlan, optAlumno.get(), alumnoPlan.curso)
-    }
-
-    /**
      * Elimina un alumno de la base de datos a partir de su ID
      *
      * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
@@ -141,6 +126,30 @@ class AlumnoService {
     }
 
     /**
+     * Añade un plan con un curso a un alumno.
+     *
+     * @param id
+     * @return
+     */
+    Optional<AlumnoConPlanesDTO> addPlan(AlumnoPlanAltaDTO alumnoPlan) {
+        Optional<Alumno> optAlumno = alumnoRepository.findById(alumnoPlan.alumno_id)
+        if (optAlumno.isEmpty()) {
+            return Optional.empty()
+        }
+        Optional<Plan> optPlan = planRepository.findById(alumnoPlan.plan_id)
+        // TODO: Llamar getPlanesFromAlumno() después de añadir
+        return addOptionalPlan(optPlan, optAlumno.get(), alumnoPlan.curso)
+    }
+
+    Optional<AlumnoConPlanesDTO> getPlanesFromAlumno(Integer alumnoId) {
+        Optional<Alumno> alumno = alumnoRepository.findById(alumnoId)
+        if (alumno.isEmpty()) {
+            return Optional.empty()
+        }
+        return Optional.of(new AlumnoConPlanesDTO(alumno.get()))
+    }
+
+    /**
      * TODO: Pasar de usar BOOL a usar HTTP STATUS CODES
      *
      * @param alumnosPlanId
@@ -156,6 +165,8 @@ class AlumnoService {
     }
 
     /**
+     * TODO: Revisar interacción entre tablas/servicios/repositorios
+     *
      * @param id ID del alumno
      * @return true si existe, false si no existe
      */
