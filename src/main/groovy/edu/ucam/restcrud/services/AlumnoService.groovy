@@ -3,7 +3,12 @@ package edu.ucam.restcrud.services
 import edu.ucam.restcrud.beans.dtos.AlumnoConPlanesDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoPlanAltaDTO
-
+import edu.ucam.restcrud.controllers.exceptions.BadCreateException
+import edu.ucam.restcrud.controllers.exceptions.BadUpdateException
+import edu.ucam.restcrud.controllers.exceptions.NotFoundException
+import edu.ucam.restcrud.controllers.exceptions.enums.BadCreateEnum
+import edu.ucam.restcrud.controllers.exceptions.enums.BadUpdateEnum
+import edu.ucam.restcrud.controllers.exceptions.enums.EntityType
 import edu.ucam.restcrud.database.entities.Alumno
 import edu.ucam.restcrud.database.entities.AlumnoPlan
 import edu.ucam.restcrud.database.entities.Correo
@@ -30,7 +35,7 @@ class AlumnoService {
      * @param alumno DTO con datos del alumno con o sin ID
      * @return Optional con los datos del alumno creado o modificado
      */
-    Optional<AlumnoDTO> save(@Valid AlumnoDTO alumnoDto) {
+    AlumnoDTO save(@Valid AlumnoDTO alumnoDto) {
         Alumno alumno
         // Crear
         if (alumnoDto.id == null) {
@@ -42,7 +47,7 @@ class AlumnoService {
         }
         // Error (editar alumno no encontrado)
         else {
-            return Optional.empty()
+            throw new NotFoundException(EntityType.ALUMNO, alumnoDto.id)
         }
 
         alumno.setTipoDocumento(alumnoDto.getTipoDocumento())
@@ -50,7 +55,7 @@ class AlumnoService {
         alumno.setNombreCompleto(alumnoDto.getNombreCompleto())
         alumno.setFechaNacimiento(alumnoDto.getFechaNacimiento())
         alumnoRepository.save(alumno)
-        return Optional.of(toDto(alumno))
+        return toDto(alumno)
     }
 
     /**
@@ -81,12 +86,14 @@ class AlumnoService {
      *
      * @param id ID numérica del alumno
      * @param completo Booleano indicando si se deben mostrar todos los datos
-     * @return un valor opcional con el alumno encontrado o nada
+     * @return el alumno encontrado
      */
-    Optional<AlumnoDTO> get(Integer id, boolean completo = false) {
+    AlumnoDTO get(Integer id, boolean completo = false) {
         Optional<Alumno> alumno = alumnoRepository.findById(id)
-        // Recibe un Optional, devuelve un Optional
-        return toDto(alumno, completo)
+        if (alumno.isEmpty()) {
+            throw new NotFoundException(EntityType.ALUMNO, id)
+        }
+        return toDto(alumno.get(), completo)
     }
 
     /**
@@ -105,12 +112,11 @@ class AlumnoService {
      * Elimina un alumno de la base de datos a partir de su ID
      *
      * @param id Identificador único del alumno
-     * @return true si se ha eliminado el alumno, false si no se ha eliminado
      */
-    boolean delete(Integer id) {
+    void delete(Integer id) {
         Optional<Alumno> optAlumno = alumnoRepository.findById(id)
         if (optAlumno.isEmpty()) {
-            return false
+            throw new NotFoundException(EntityType.ALUMNO, id)
         }
 
         // Borrar todos los registros de cursos para este alumno
@@ -120,7 +126,6 @@ class AlumnoService {
         }
         // Borrar alumno
         alumnoRepository.deleteById(id)
-        return true
     }
 
     /**
@@ -129,16 +134,18 @@ class AlumnoService {
      * @param id
      * @return
      */
-    Optional<AlumnoConPlanesDTO> addPlan(AlumnoPlanAltaDTO alumnoPlan) {
+    AlumnoConPlanesDTO addPlan(AlumnoPlanAltaDTO alumnoPlan) {
         // Necesitamos que la ID de la relación sea NULL pero que la del alumno NO sea NULL
         if (alumnoPlan.id != null || alumnoPlan.alumno_id == null) {
-            return Optional.empty()
+            throw new BadCreateException(EntityType.ALUMNO_PLAN, BadCreateEnum.RELATIONSHIP_ID_SPECIFIED)
         }
 
         Optional<Alumno> optAlumno = alumnoRepository.findById(alumnoPlan.alumno_id)
         Optional<Plan> optPlan = planRepository.findById(alumnoPlan.plan_id)
-        if (optPlan.isEmpty() || optAlumno.isEmpty()) {
-            return Optional.empty()
+        if (optPlan.isEmpty()) {
+            throw new NotFoundException(EntityType.ALUMNO, alumnoPlan.alumno_id)
+        } else if (optAlumno.isEmpty()) {
+            throw new NotFoundException(EntityType.PLAN, alumnoPlan.plan_id)
         }
 
         Alumno alumno = optAlumno.get()
@@ -149,27 +156,30 @@ class AlumnoService {
         assoc.curso = alumnoPlan.curso
 
         alumnoPlanRepository.save(assoc)
-        return Optional.of(new AlumnoConPlanesDTO(alumno))
+        return new AlumnoConPlanesDTO(alumno)
     }
 
-    Optional<AlumnoConPlanesDTO> getPlanes(Integer alumnoId) {
+    AlumnoConPlanesDTO getPlanes(Integer alumnoId) {
         Optional<Alumno> alumno = alumnoRepository.findById(alumnoId)
         if (alumno.isEmpty()) {
-            return Optional.empty()
+            throw new NotFoundException(EntityType.ALUMNO, alumnoId)
         }
-        return Optional.of(new AlumnoConPlanesDTO(alumno.get()))
+        return new AlumnoConPlanesDTO(alumno.get())
     }
 
-    Optional<AlumnoConPlanesDTO> updatePlan(AlumnoPlanAltaDTO alumnoPlanDto) {
+    AlumnoConPlanesDTO updatePlan(AlumnoPlanAltaDTO alumnoPlanDto) {
         // Queremos modificar por ID de la relación, necesitamos que la ID del alumno SEA NULL
         if (alumnoPlanDto.id == null || alumnoPlanDto.alumno_id != null) {
-            return Optional.empty()
+            throw new BadUpdateException(EntityType.ALUMNO_PLAN, BadUpdateEnum.RELATIONSHIP_ID_NOT_SPECIFIED)
         }
 
         Optional<AlumnoPlan> optAlumnoPlan = alumnoPlanRepository.findById(alumnoPlanDto.id)
         Optional<Plan> optPlan = planRepository.findById(alumnoPlanDto.plan_id)
-        if (optAlumnoPlan.isEmpty() || optPlan.isEmpty()) {
-            return Optional.empty()
+
+        if (optAlumnoPlan.isEmpty()) {
+            throw new NotFoundException(EntityType.ALUMNO_PLAN, alumnoPlanDto.id)
+        } else if (optPlan.isEmpty()) {
+            throw new NotFoundException(EntityType.PLAN, alumnoPlanDto.plan_id)
         }
 
         AlumnoPlan alumnoPlan = optAlumnoPlan.get()
@@ -178,20 +188,18 @@ class AlumnoService {
         alumnoPlan.plan = optPlan.get()
         alumnoPlanRepository.save(alumnoPlan)
 
-        return Optional.of(new AlumnoConPlanesDTO(alumnoPlan.alumno))
+        return new AlumnoConPlanesDTO(alumnoPlan.alumno)
     }
 
     /**
      * @param alumnosPlanId
-     * @return
      */
-    boolean removePlan(Integer alumnosPlanId) {
+    void removePlan(Integer alumnosPlanId) {
         Optional<AlumnoPlan> alumnoPlan = alumnoPlanRepository.findById(alumnosPlanId)
         if (alumnoPlan.isEmpty()) {
-            return false
+            throw new NotFoundException(EntityType.ALUMNO_PLAN, alumnosPlanId)
         }
         alumnoPlanRepository.delete(alumnoPlan.get())
-        return true
     }
 
     /**
@@ -241,11 +249,5 @@ class AlumnoService {
     }
     private static AlumnoDTO toDto(Alumno a, boolean completo = false) {
         return new AlumnoDTO(a, completo)
-    }
-    private static Optional<AlumnoDTO> toDto(Optional<Alumno> a, boolean completo = false) {
-        if (a.isEmpty()) {
-            return Optional.empty()
-        }
-        Optional.of(new AlumnoDTO(a.get(), completo))
     }
 }

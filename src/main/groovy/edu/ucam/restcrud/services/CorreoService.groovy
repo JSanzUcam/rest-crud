@@ -54,20 +54,15 @@ class CorreoService {
     }
 
     /**
-     * Devuelve todos los correos de un alumno en un Optional.
-     * El Optional estará vacío si el alumno no existe
+     * Devuelve todos los correos de un alumno
      *
      * @param alumnoId
-     * @return Optional de una Lista de CorreosDTO
+     * @return Lista de CorreosDTO
      */
-    Optional<List<CorreoDTO>> getByUserId(Integer alumnoId) {
-        Optional<AlumnoDTO> alumno = alumnoService.get(alumnoId, true)
-        if (alumno.isEmpty()) {
-            return Optional.empty()
-        }
-
-        List<CorreoDTO> correos = alumno.get().getCorreos()
-        return Optional.of(correos)
+    List<CorreoDTO> getByUserId(Integer alumnoId) {
+        AlumnoDTO alumno = alumnoService.get(alumnoId, true)
+        List<CorreoDTO> correos = alumno.getCorreos()
+        return correos
     }
 
     /**

@@ -7,7 +7,11 @@ import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoPlanAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoDTO
-
+import edu.ucam.restcrud.controllers.exceptions.BadCreateException
+import edu.ucam.restcrud.controllers.exceptions.BadUpdateException
+import edu.ucam.restcrud.controllers.exceptions.enums.BadCreateEnum
+import edu.ucam.restcrud.controllers.exceptions.enums.BadUpdateEnum
+import edu.ucam.restcrud.controllers.exceptions.enums.EntityType
 import edu.ucam.restcrud.database.entities.Alumno
 import edu.ucam.restcrud.services.AlumnoService
 import edu.ucam.restcrud.services.CorreoService
@@ -37,13 +41,12 @@ class AlumnoController {
 
     // [C]reate
     @PostMapping
-    ResponseEntity<AlumnoDTO> create(@Valid @RequestBody AlumnoDTO entradaDto) {
+    AlumnoDTO create(@Valid @RequestBody AlumnoDTO entradaDto) {
         // Nos aseguramos de que no estamos intentando modificar ningún alumno
         if (entradaDto.id != null) {
-            return ResponseEntity.badRequest().build()
+            throw new BadCreateException(EntityType.ALUMNO, BadCreateEnum.ENTITY_ID_SPECIFIED)
         }
-        AlumnoDTO respuestaDto = alumnoService.save(entradaDto).get()
-        ResponseEntity.ok(respuestaDto)
+        return alumnoService.save(entradaDto)
     }
     // [R]ead
     @GetMapping
@@ -55,38 +58,24 @@ class AlumnoController {
         if (!id) {
             return ResponseEntity.ok(alumnoService.getAll(completo))
         }
-
-        Optional<AlumnoDTO> optAlumno = alumnoService.get(id, completo)
-        if (optAlumno.empty) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok(optAlumno.get())
-        }
+        AlumnoDTO alumno = alumnoService.get(id, completo)
+        return ResponseEntity.ok(alumno)
     }
     // [U]pdate
     @PutMapping
-    ResponseEntity<?> update(
-            @Valid @RequestBody AlumnoDTO dto
+    AlumnoDTO update(
+        @Valid @RequestBody AlumnoDTO dto
     ) {
         if (dto.id == null) {
-            return ResponseEntity.badRequest().build()
+            throw new BadUpdateException(EntityType.ALUMNO, BadUpdateEnum.ENTITY_ID_NOT_SPECIFIED)
         }
-
-        Optional<AlumnoDTO> alumnoOpt = alumnoService.save(dto)
-        if (alumnoOpt.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok(alumnoOpt.get())
-        }
+        return alumnoService.save(dto)
     }
     // [D]elete
     @DeleteMapping
     ResponseEntity<?> delete(@RequestParam("id") Integer id) {
-        if (!alumnoService.delete(id)) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok("Eliminado correctamente")
-        }
+        alumnoService.delete(id)
+        return ResponseEntity.ok("Eliminado correctamente")
     }
 
     // BUSCAR
@@ -109,8 +98,8 @@ class AlumnoController {
     // CORREO
     @PostMapping("/correos")
     ResponseEntity<?> createCorreo(
-            @RequestParam('id') Integer alumnoId,
-            @Valid @RequestBody CorreoAltaDTO body
+        @RequestParam('id') Integer alumnoId,
+        @Valid @RequestBody CorreoAltaDTO body
     ) {
         Optional<CorreoDTO> res = correoService.addToAlumno(alumnoId, body)
         if (res.isEmpty()) {
@@ -121,50 +110,27 @@ class AlumnoController {
     }
     @GetMapping("/correos")
     ResponseEntity<?> getCorreos(@RequestParam('id') Integer alumnoId) {
-        Optional<List<CorreoDTO>> listaCorreos = correoService.getByUserId(alumnoId)
-        if (listaCorreos.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok(listaCorreos.get())
-        }
+        List<CorreoDTO> listaCorreos = correoService.getByUserId(alumnoId)
+        ResponseEntity.ok(listaCorreos)
     }
 
     // CURSOS
     @PostMapping("/cursos")
-    ResponseEntity<?> addPlan(@Valid @RequestBody AlumnoPlanAltaDTO alumnoPlan) {
-        Optional<AlumnoDTO> alumno = alumnoService.addPlan(alumnoPlan)
-
-        if (alumno.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok(alumno.get())
-        }
+    AlumnoDTO addPlan(@Valid @RequestBody AlumnoPlanAltaDTO alumnoPlan) {
+        return alumnoService.addPlan(alumnoPlan)
     }
     @GetMapping("/cursos")
-    ResponseEntity<?> getPlanes(@RequestParam("id") Integer alumnoId) {
-        Optional<AlumnoConPlanesDTO> planes = alumnoService.getPlanes(alumnoId)
-        if (planes.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok(planes.get())
-        }
+    AlumnoConPlanesDTO getPlanes(@RequestParam("id") Integer alumnoId) {
+        return alumnoService.getPlanes(alumnoId)
     }
     @PutMapping("/cursos")
-    ResponseEntity<?> updatePlan(@Valid @RequestBody AlumnoPlanAltaDTO alumnoPlan) {
-        Optional<AlumnoDTO> alumno = alumnoService.updatePlan(alumnoPlan)
-        if (alumno.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok(alumno.get())
-        }
+    AlumnoDTO updatePlan(@Valid @RequestBody AlumnoPlanAltaDTO alumnoPlan) {
+        return alumnoService.updatePlan(alumnoPlan)
     }
     @DeleteMapping("/cursos")
     ResponseEntity<?> removePlan(@RequestParam("id") Integer alumnoPlanId) {
-        if (!alumnoService.removePlan(alumnoPlanId)) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok("Eliminado correctamente")
-        }
+        alumnoService.removePlan(alumnoPlanId)
+        return ResponseEntity.ok("Eliminado correctamente")
     }
 
     // DEBUG: Nuke. Borra todos los contenidos de la tabla
