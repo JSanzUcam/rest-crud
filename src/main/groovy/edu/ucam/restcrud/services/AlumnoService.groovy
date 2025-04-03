@@ -5,6 +5,7 @@ import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 import edu.ucam.restcrud.beans.dtos.AlumnoPlanAltaDTO
 import edu.ucam.restcrud.controllers.exceptions.BadCreateException
 import edu.ucam.restcrud.controllers.exceptions.BadUpdateException
+import edu.ucam.restcrud.controllers.exceptions.InvalidArgumentsException
 import edu.ucam.restcrud.controllers.exceptions.NotFoundException
 import edu.ucam.restcrud.controllers.exceptions.enums.BadCreateEnum
 import edu.ucam.restcrud.controllers.exceptions.enums.BadUpdateEnum
@@ -146,6 +147,14 @@ class AlumnoService {
             throw new NotFoundException(EntityType.ALUMNO, alumnoPlan.alumno_id)
         } else if (optAlumno.isEmpty()) {
             throw new NotFoundException(EntityType.PLAN, alumnoPlan.plan_id)
+        }
+
+        // No podemos apuntarnos a un curso mayor que la fecha de eliminación
+        Short anyoMaximo = optPlan.get().borrarEn
+        if (anyoMaximo != null) {
+            if (alumnoPlan.curso >= anyoMaximo) {
+                throw new InvalidArgumentsException(EntityType.ALUMNO_PLAN, "año menor que " + anyoMaximo, alumnoPlan.curso)
+            }
         }
 
         Alumno alumno = optAlumno.get()
