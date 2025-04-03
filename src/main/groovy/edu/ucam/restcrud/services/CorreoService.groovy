@@ -3,6 +3,8 @@ package edu.ucam.restcrud.services
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
 import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoDTO
+import edu.ucam.restcrud.controllers.exceptions.NotFoundException
+import edu.ucam.restcrud.controllers.exceptions.enums.EntityType
 import edu.ucam.restcrud.database.entities.Correo
 import edu.ucam.restcrud.database.repositories.CorreoRepository
 import jakarta.validation.Valid
@@ -22,11 +24,11 @@ class CorreoService {
      *
      * @param alumnoId
      * @param correoDto
-     * @return <code>Optional&lt;CorreoDTO&gt;</code> con el correo si se ha añadido o vacío si el alumno no existe
+     * @return CorreoDTO del correo nuevo
      */
-    Optional<CorreoDTO> addToAlumno(Integer alumnoId, @Valid CorreoAltaDTO correoDto) {
+    CorreoDTO addToAlumno(Integer alumnoId, @Valid CorreoAltaDTO correoDto) {
         if (!alumnoService.exists(alumnoId)) {
-            return Optional.empty()
+            throw new NotFoundException(EntityType.ALUMNO, alumnoId)
         }
 
         // Creamos un correo a partir del DTO
@@ -37,8 +39,7 @@ class CorreoService {
         alumnoService.addCorreoToAlumno(alumnoId, correo)
         correoRepository.save(correo)
 
-        CorreoDTO dtoSalida = new CorreoDTO(correo)
-        return Optional.of(dtoSalida)
+        return new CorreoDTO(correo)
     }
 
     /**
@@ -70,16 +71,19 @@ class CorreoService {
      *
      * @param id la ID del correo
      * @param newCorreo el nuevo correo en forma de CorreoAltaDTO
-     * @return Un Optional con el DTO de objeto modificado o nada si no se encontró un correo con esa ID
+     * @return DTO de objeto modificado
      */
-    Optional<CorreoDTO> updateById(Integer id, @Valid CorreoAltaDTO newCorreo) {
+    CorreoDTO updateById(Integer id, @Valid CorreoAltaDTO newCorreo) {
         Optional<Correo> correoOpt = correoRepository.findById(id)
         if (correoOpt.isEmpty()) {
-            return Optional.empty()
+            throw new NotFoundException(EntityType.CORREO, id)
         }
 
         Correo correo = correoOpt.get()
-        return Optional.of(update(correo, newCorreo))
+        correo.setCorreo(newCorreo.correo)
+        correoRepository.save(correo)
+
+        return new CorreoDTO(correo)
     }
 
     /**
@@ -94,20 +98,5 @@ class CorreoService {
         }
         correoRepository.deleteById(id)
         return true
-    }
-
-    /**
-     * Cambia la dirección de correo a una entidad de Correo
-     *
-     * @param correo La entidad
-     * @param newCorreo La nueva dirección de correo en un CorreoAltaDTO
-     * @return el objeto actualizado en forma de DTO
-     */
-    private CorreoDTO update(Correo correo, CorreoAltaDTO newCorreo) {
-        correo.setCorreo(newCorreo.correo)
-        correoRepository.save(correo)
-
-        CorreoDTO salidaDto = new CorreoDTO(correo)
-        return salidaDto
     }
 }

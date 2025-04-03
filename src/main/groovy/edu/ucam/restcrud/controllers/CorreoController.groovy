@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-// TODO: RestControllerAdvice para control de errores global
-
 @RestController
 @RequestMapping(path = "/api/correos")
 class CorreoController {
@@ -29,24 +27,16 @@ class CorreoController {
     }
     // [U]pdate
     @PutMapping()
-    ResponseEntity<?> update(
+    CorreoDTO update(
         @RequestParam('id') Integer correoId,
         @Valid @RequestBody CorreoAltaDTO body
     ) {
-        Optional<CorreoDTO> newCorreo = correoService.updateById(correoId, body)
-        if (newCorreo.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok(newCorreo.get())
-        }
+        return correoService.updateById(correoId, body)
     }
     // [D]elete
     @DeleteMapping
     ResponseEntity<?> delete(@RequestParam('id') Integer correoId) {
-        if (!correoService.delete(correoId)) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok("Eliminado correctamente")
-        }
+        correoService.delete(correoId)
+        return ResponseEntity.ok("Eliminado correctamente")
     }
 }

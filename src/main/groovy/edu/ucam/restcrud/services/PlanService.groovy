@@ -3,6 +3,8 @@ package edu.ucam.restcrud.services
 
 import edu.ucam.restcrud.beans.dtos.PlanConAlumnosDTO
 import edu.ucam.restcrud.beans.dtos.PlanDTO
+import edu.ucam.restcrud.controllers.exceptions.NotFoundException
+import edu.ucam.restcrud.controllers.exceptions.enums.EntityType
 import edu.ucam.restcrud.database.entities.AlumnoPlan
 import edu.ucam.restcrud.database.entities.Plan
 import edu.ucam.restcrud.database.repositories.AlumnoPlanRepository
@@ -31,18 +33,18 @@ class PlanService {
         return new PlanDTO(plan)
     }
 
-    Optional<PlanDTO> get(Integer id, boolean alumnos = false) {
+    PlanDTO get(Integer id, boolean alumnos = false) {
         def now = Year.now().getValue()
         Optional<Plan> plan = planRepository.findByIdAndBorrarEnIsNullOrBorrarEnGreaterThan(id, (short)now)
         // Si no hay nada salir
         if (plan.isEmpty()) {
-            return Optional.empty()
+            throw new NotFoundException(EntityType.PLAN, id)
         }
         // Devolver un DTO u otro dependiendo de si queremos alumnos o no
         if (alumnos) {
-            return Optional.of(new PlanConAlumnosDTO(plan.get()))
+            return new PlanConAlumnosDTO(plan.get())
         } else {
-            return Optional.of(new PlanDTO(plan.get()))
+            return new PlanDTO(plan.get())
         }
     }
 
@@ -63,16 +65,16 @@ class PlanService {
         return planesDto
     }
 
-    Optional<PlanDTO> update(PlanDTO planDto) {
+    PlanDTO update(PlanDTO planDto) {
         Optional<Plan> planOpt = planRepository.findById(planDto.id)
         if (planOpt.isEmpty()) {
-            return Optional.empty()
+            throw new NotFoundException(EntityType.PLAN, planDto.id)
         }
         Plan plan = planOpt.get()
         plan.nombre = planDto.nombre
         plan.tipo = planDto.tipo
         planRepository.save(plan)
-        return Optional.of(new PlanDTO(plan))
+        return new PlanDTO(plan)
     }
 
     /**
@@ -83,17 +85,14 @@ class PlanService {
      *
      * @param id ID del plan a eliminar
      * @param borrarEn Nuevo año de eliminación
-     * @return false si no se encuentra el plan, true en caso contrario
      */
-    boolean logicDel(Integer id, Short borrarEn) {
+    void logicDel(Integer id, Short borrarEn) {
         Optional<Plan> plan = planRepository.findById(id)
         if (plan.isEmpty()) {
-            return false
+            throw new NotFoundException(EntityType.PLAN, id)
         }
-
         plan.get().setBorrarEn(borrarEn)
         planRepository.save(plan.get())
-        return true
     }
 
     /**
@@ -103,12 +102,11 @@ class PlanService {
      * Usa logicDel() para realizar un borrado lógico
      *
      * @param id - ID del plan a eliminar
-     * @return true si se elimina, false si no
      */
-    boolean delete(Integer id) {
+    void delete(Integer id) {
         Optional<Plan> plan = planRepository.findById(id)
         if (plan.isEmpty()) {
-            return false
+            throw new NotFoundException(EntityType.PLAN, id)
         }
 
         List<AlumnoPlan> alumnosPlanes = plan.get().getAlumnoAssoc()
@@ -119,6 +117,5 @@ class PlanService {
         }
 
         planRepository.delete(plan.get())
-        return true
     }
 }

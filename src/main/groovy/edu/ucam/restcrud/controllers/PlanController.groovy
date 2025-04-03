@@ -30,24 +30,16 @@ class PlanController {
         @RequestParam(name = "alumnos", required = false) boolean incluirAlumnos
     ) {
         if (id != null) {
-            Optional<PlanDTO> plan = planService.get(id, incluirAlumnos)
-            if (plan.isEmpty()) {
-                return ResponseEntity.notFound().build()
-            } else {
-                return ResponseEntity.ok(plan.get())
-            }
+            PlanDTO plan = planService.get(id, incluirAlumnos)
+            return ResponseEntity.ok(plan)
         } else {
             return ResponseEntity.ok(planService.getAll(incluirAlumnos))
         }
     }
 
     @PutMapping
-    ResponseEntity<?> update(@RequestBody PlanDTO planDto) {
-        Optional<PlanDTO> planOpt = planService.update(planDto)
-        if (planOpt.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        }
-        return ResponseEntity.ok(planOpt.get())
+    PlanDTO update(@RequestBody PlanDTO planDto) {
+        return planService.update(planDto)
     }
 
     @DeleteMapping
@@ -55,10 +47,7 @@ class PlanController {
         @RequestParam("id") Integer id,
         @RequestParam("borrar_en") Short borrarEn
     ) {
-        if (!planService.logicDel(id, borrarEn)) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok().build()
-        }
+        planService.logicDel(id, borrarEn)
+        return ResponseEntity.ok("Eliminado correctamente")
     }
 }

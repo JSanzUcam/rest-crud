@@ -97,16 +97,11 @@ class AlumnoController {
 
     // CORREO
     @PostMapping("/correos")
-    ResponseEntity<?> createCorreo(
+    CorreoDTO createCorreo(
         @RequestParam('id') Integer alumnoId,
         @Valid @RequestBody CorreoAltaDTO body
     ) {
-        Optional<CorreoDTO> res = correoService.addToAlumno(alumnoId, body)
-        if (res.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        } else {
-            return ResponseEntity.ok(res.get())
-        }
+        return correoService.addToAlumno(alumnoId, body)
     }
     @GetMapping("/correos")
     ResponseEntity<?> getCorreos(@RequestParam('id') Integer alumnoId) {
