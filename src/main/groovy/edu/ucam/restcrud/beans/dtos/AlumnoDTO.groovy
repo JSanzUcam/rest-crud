@@ -3,6 +3,7 @@ package edu.ucam.restcrud.beans.dtos
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import edu.ucam.restcrud.beans.dtos.structs.PlanCurso
 import edu.ucam.restcrud.beans.enums.TipoDocumentoEnum
 import edu.ucam.restcrud.beans.validators.DocumentFormat
 import edu.ucam.restcrud.database.entities.Alumno
@@ -26,6 +27,8 @@ class AlumnoDTO {
     // Solo se muestra cuando pedimos que se muestre todo desde el constructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     List<CorreoDTO> correos
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    List<PlanCurso> planes
 
     @Past(message = "La fecha de nacimiento no puede ser futura")
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -37,6 +40,9 @@ class AlumnoDTO {
         numeroDocumento = "00000000A"
         nombreCompleto = "default"
         fechaNacimiento = Date.from(Instant.EPOCH)
+
+        correos = null
+        planes = null
     }
     AlumnoDTO(Alumno a, boolean completo = false) {
         this.id = a.id
@@ -52,8 +58,19 @@ class AlumnoDTO {
                     return new CorreoDTO(correo)
                 })
                 .collect()
+            this.planes = a.planAssoc
+                .stream()
+                .map(plan -> {
+                    def pc = new PlanCurso()
+                    pc.id = plan.id
+                    pc.plan = new PlanDTO(plan.plan)
+                    pc.curso = plan.curso
+                    pc
+                })
+                .collect()
         } else {
             this.correos = null
+            this.planes = null
         }
     }
 

@@ -1,16 +1,10 @@
 package edu.ucam.restcrud.beans.dtos
 
+import edu.ucam.restcrud.beans.dtos.structs.PlanCurso
 import edu.ucam.restcrud.database.entities.Alumno
 
-class PlanCurso {
-    Integer id
-    PlanDTO plan
-    Short curso
-}
-
 class AlumnoConPlanesDTO extends AlumnoDTO {
-    List<PlanDTO> planes
-
+    List<PlanCurso> planes
 
     AlumnoConPlanesDTO(Alumno a) {
         super(a)
