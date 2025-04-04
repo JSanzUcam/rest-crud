@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import edu.ucam.restcrud.beans.enums.TipoDocumentoEnum
 import groovyjarjarantlr4.v4.runtime.misc.NotNull
 import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -17,25 +18,33 @@ import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = ['tipo_documento', 'numero_documento']))
+@Table(
+    uniqueConstraints = @UniqueConstraint(columnNames = ['tipo_documento', 'numero_documento']),
+    name = "alumno"
+)
 class Alumno {
     @Id
     @GeneratedValue
+    @Column(name = "id")
     Integer id
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_documento")
     TipoDocumentoEnum tipoDocumento
 
     @NotNull
+    @Column(name = "numero_documento")
     String numeroDocumento
 
     // Nombre con apellidos
     @NotNull
+    @Column(name = "nombre_completo")
     String nombreCompleto
 
     @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "fecha_nacimiento")
     Date fechaNacimiento
 
     // One to many de correos

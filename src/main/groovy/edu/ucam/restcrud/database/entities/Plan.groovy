@@ -10,22 +10,30 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
+import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 
 @Entity
+@Table(name = "plan")
 class Plan {
     @Id
     @GeneratedValue
+    @Column(name = "id")
     Integer id
 
     @NotNull
-    @Column(unique = true)
+    @Column(
+        unique = true,
+        name = "nombre"
+    )
     String nombre
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "tipo")
     TipoEstudioEnum tipo
 
     // Año de eliminación
+    @Column(name = "borrar_en")
     Short borrarEn
 
     @OneToMany(

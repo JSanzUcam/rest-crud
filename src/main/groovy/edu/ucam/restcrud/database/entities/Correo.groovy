@@ -4,23 +4,31 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 
 import java.sql.Timestamp
 
 @Entity
+@Table(name = "correo")
 class Correo {
     @Id
     @GeneratedValue
+    @Column(name = "id")
     Integer id
 
-    @Column(unique = true)
+    @Column(
+        unique = true,
+        name = "correo"
+    )
     String correo
 
     @CreationTimestamp
+    @Column(name = "fecha_alta")
     Timestamp fechaAlta
     @UpdateTimestamp
+    @Column(name = "fecha_modificacion")
     Timestamp fechaModificacion
 
     Integer getId() {
