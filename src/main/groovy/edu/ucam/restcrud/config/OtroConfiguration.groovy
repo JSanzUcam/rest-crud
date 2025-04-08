@@ -16,9 +16,9 @@ import org.springframework.transaction.PlatformTransactionManager
 import javax.sql.DataSource
 
 @Configuration
-@PropertySource("classpath:database.properties")
+@PropertySource("classpath:application.properties")
 @EnableJpaRepositories(
-    basePackages = "edu.ucam.restcrud.database.otro",
+    basePackages = "edu.ucam.restcrud.database.otro.repositories",
     entityManagerFactoryRef = "otroEntityManager",
     transactionManagerRef = "otroTransactionManager"
 )
@@ -30,14 +30,15 @@ class OtroConfiguration {
     LocalContainerEntityManagerFactoryBean otroEntityManager() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean()
         em.setDataSource(otroDataSource())
-        em.setPackagesToScan(new String[] {"edu.ucam.restcrud.database.otro"})
+        em.setPackagesToScan(new String[] {"edu.ucam.restcrud.database.otro.entities"})
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter()
         em.setJpaVendorAdapter(vendorAdapter)
 
         HashMap<String, Object> properties = new HashMap<>()
-        properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"))
-        properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"))
+        properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.otro-datasource.hibernate.ddl-auto"))
+        properties.put("hibernate.dialect", env.getProperty("spring.otro-datasource.hibernate.dialect"))
+        properties.put("hibernate.show_sql", env.getProperty("spring.otro-datasource.show-sql"))
         em.setJpaPropertyMap(properties)
 
         return em

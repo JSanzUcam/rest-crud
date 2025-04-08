@@ -4,7 +4,8 @@ public enum EntityType {
     ALUMNO,
     CORREO,
     PLAN,
-    ALUMNO_PLAN;
+    ALUMNO_PLAN,
+    OTRO;
 
     @Override
     public String toString() {
@@ -13,6 +14,7 @@ public enum EntityType {
             case CORREO -> "Correo";
             case PLAN -> "Plan";
             case ALUMNO_PLAN -> "Alumno-Plan";
+            case OTRO -> "Otro";
         };
     }
 }

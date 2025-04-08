@@ -17,7 +17,7 @@ import org.springframework.transaction.PlatformTransactionManager
 import javax.sql.DataSource
 
 @Configuration
-@PropertySource("classpath:database.properties")
+@PropertySource("classpath:application.properties")
 @EnableJpaRepositories(
     basePackages = "edu.ucam.restcrud.database.universidad",
     entityManagerFactoryRef = "universidadEntityManager",
@@ -37,10 +37,10 @@ class UniversidadConfiguration {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter()
         em.setJpaVendorAdapter(vendorAdapter)
 
-        // TODO: Revisar. Usar el Env para estas configuraciones?
         HashMap<String, Object> properties = new HashMap<>()
-        properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"))
-        properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"))
+        properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.datasource.hibernate.ddl-auto"))
+        properties.put("hibernate.dialect", env.getProperty("spring.datasource.hibernate.dialect"))
+        properties.put("hibernate.show_sql", env.getProperty("spring.datasource.show-sql"))
         em.setJpaPropertyMap(properties)
 
         return em
