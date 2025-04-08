@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import edu.ucam.restcrud.beans.dtos.structs.PlanCurso
 import edu.ucam.restcrud.beans.enums.TipoDocumentoEnum
 import edu.ucam.restcrud.beans.validators.DocumentFormat
-import edu.ucam.restcrud.database.entities.Alumno
+import edu.ucam.restcrud.database.universidad.entities.Alumno
 import groovyjarjarantlr4.v4.runtime.misc.NotNull
 import jakarta.validation.constraints.Past
 

@@ -1,6 +1,6 @@
-package edu.ucam.restcrud.database.repositories
+package edu.ucam.restcrud.database.universidad.repositories
 
-import edu.ucam.restcrud.database.entities.Plan
+import edu.ucam.restcrud.database.universidad.entities.Plan
 import org.springframework.data.repository.CrudRepository
 
 interface PlanRepository extends CrudRepository<Plan, Integer> {

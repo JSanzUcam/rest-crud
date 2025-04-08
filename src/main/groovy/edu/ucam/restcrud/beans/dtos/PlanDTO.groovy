@@ -3,7 +3,7 @@ package edu.ucam.restcrud.beans.dtos
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import edu.ucam.restcrud.beans.enums.TipoEstudioEnum
-import edu.ucam.restcrud.database.entities.Plan
+import edu.ucam.restcrud.database.universidad.entities.Plan
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class PlanDTO {

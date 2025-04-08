@@ -5,11 +5,11 @@ import edu.ucam.restcrud.beans.dtos.PlanConAlumnosDTO
 import edu.ucam.restcrud.beans.dtos.PlanDTO
 import edu.ucam.restcrud.controllers.exceptions.NotFoundException
 import edu.ucam.restcrud.controllers.exceptions.enums.EntityType
-import edu.ucam.restcrud.database.entities.AlumnoPlan
-import edu.ucam.restcrud.database.entities.Plan
-import edu.ucam.restcrud.database.repositories.AlumnoPlanRepository
-import edu.ucam.restcrud.database.repositories.AlumnoRepository
-import edu.ucam.restcrud.database.repositories.PlanRepository
+import edu.ucam.restcrud.database.universidad.entities.AlumnoPlan
+import edu.ucam.restcrud.database.universidad.entities.Plan
+import edu.ucam.restcrud.database.universidad.repositories.AlumnoPlanRepository
+import edu.ucam.restcrud.database.universidad.repositories.AlumnoRepository
+import edu.ucam.restcrud.database.universidad.repositories.PlanRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 

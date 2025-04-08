@@ -1,21 +1,10 @@
-package edu.ucam.restcrud.database.entities
+package edu.ucam.restcrud.database.universidad.entities
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import edu.ucam.restcrud.beans.enums.TipoDocumentoEnum
 import groovyjarjarantlr4.v4.runtime.misc.NotNull
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
-import jakarta.persistence.UniqueConstraint
+import jakarta.persistence.*
 
 @Entity
 @Table(

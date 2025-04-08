@@ -5,8 +5,8 @@ import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
 import edu.ucam.restcrud.beans.dtos.CorreoDTO
 import edu.ucam.restcrud.controllers.exceptions.NotFoundException
 import edu.ucam.restcrud.controllers.exceptions.enums.EntityType
-import edu.ucam.restcrud.database.entities.Correo
-import edu.ucam.restcrud.database.repositories.CorreoRepository
+import edu.ucam.restcrud.database.universidad.entities.Correo
+import edu.ucam.restcrud.database.universidad.repositories.CorreoRepository
 import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

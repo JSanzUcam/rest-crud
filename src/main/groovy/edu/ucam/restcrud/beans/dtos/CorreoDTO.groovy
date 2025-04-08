@@ -1,6 +1,6 @@
 package edu.ucam.restcrud.beans.dtos
 
-import edu.ucam.restcrud.database.entities.Correo
+import edu.ucam.restcrud.database.universidad.entities.Correo
 
 class CorreoDTO {
     Integer id

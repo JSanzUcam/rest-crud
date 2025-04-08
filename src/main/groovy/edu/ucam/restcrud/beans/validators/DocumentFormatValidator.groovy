@@ -1,7 +1,7 @@
 package edu.ucam.restcrud.beans.validators
 
-import edu.ucam.restcrud.beans.enums.TipoDocumentoEnum
 import edu.ucam.restcrud.beans.dtos.AlumnoDTO
+import edu.ucam.restcrud.beans.enums.TipoDocumentoEnum
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 

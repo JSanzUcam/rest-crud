@@ -1,18 +1,12 @@
 package edu.ucam.restcrud.controllers
 
-import edu.ucam.restcrud.beans.dtos.AlumnoConPlanesDTO
-import edu.ucam.restcrud.beans.dtos.AlumnoDTO
-
-
-import edu.ucam.restcrud.beans.dtos.AlumnoPlanAltaDTO
-import edu.ucam.restcrud.beans.dtos.CorreoAltaDTO
-import edu.ucam.restcrud.beans.dtos.CorreoDTO
+import edu.ucam.restcrud.beans.dtos.*
 import edu.ucam.restcrud.controllers.exceptions.BadCreateException
 import edu.ucam.restcrud.controllers.exceptions.BadUpdateException
 import edu.ucam.restcrud.controllers.exceptions.enums.BadCreateEnum
 import edu.ucam.restcrud.controllers.exceptions.enums.BadUpdateEnum
 import edu.ucam.restcrud.controllers.exceptions.enums.EntityType
-import edu.ucam.restcrud.database.entities.Alumno
+import edu.ucam.restcrud.database.universidad.entities.Alumno
 import edu.ucam.restcrud.services.AlumnoService
 import edu.ucam.restcrud.services.CorreoService
 import jakarta.validation.Valid
@@ -20,14 +14,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping(path = "/api/alumnos")
