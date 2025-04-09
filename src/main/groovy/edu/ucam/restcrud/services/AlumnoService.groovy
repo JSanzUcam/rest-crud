@@ -18,17 +18,36 @@ import edu.ucam.restcrud.database.universidad.repositories.AlumnoPlanRepository
 import edu.ucam.restcrud.database.universidad.repositories.AlumnoRepository
 import edu.ucam.restcrud.database.universidad.repositories.PlanRepository
 import jakarta.validation.Valid
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Service
 
 @Service
 class AlumnoService {
-    @Autowired
-    AlumnoRepository alumnoRepository
-    @Autowired
-    PlanRepository planRepository
-    @Autowired
-    AlumnoPlanRepository alumnoPlanRepository
+    //@Autowired
+    private AlumnoRepository alumnoRepository
+    //@Autowired
+    private PlanRepository planRepository
+    //@Autowired
+    private AlumnoPlanRepository alumnoPlanRepository
+
+    //@Autowired
+    private JdbcTemplate universidadJdbcTemplate
+    private JdbcTemplate otroJdbcTemplate
+
+    AlumnoService(
+            AlumnoRepository aluRepo,
+            PlanRepository planRepo,
+            AlumnoPlanRepository aluPlanRepo,
+            @Qualifier("universidadJdbcTemplate") JdbcTemplate uniJdbcTemplate,
+            @Qualifier("otroJdbcTemplate") JdbcTemplate otroJdbcTemplate
+    ) {
+        this.alumnoRepository = aluRepo
+        this.planRepository = planRepo
+        this.alumnoPlanRepository = aluPlanRepo
+        this.universidadJdbcTemplate = uniJdbcTemplate
+        this.otroJdbcTemplate = otroJdbcTemplate
+    }
 
     /**
      * Añade o edita un alumno en la base de datos
@@ -237,6 +256,19 @@ class AlumnoService {
         }
 
         alumno.get().correos.add(correo)
+    }
+
+    List<Map<String, Object>> getUniTemplateQuery() {
+        List<Map<String, Object>> res = universidadJdbcTemplate.queryForList("""
+            SELECT nombre_completo, p.nombre, ap.curso FROM alumno
+            JOIN alumno_plan ap on alumno.id = ap.alumno_id
+            JOIN plan p on ap.plan_id = p.id
+        """)
+        return res
+    }
+    List<Map<String, Object>> getOtroTemplateQuery() {
+        List<Map<String, Object>> res = otroJdbcTemplate.queryForList("SELECT * FROM otro_entity")
+        return res
     }
 
     /**

@@ -115,6 +115,16 @@ class AlumnoController {
         return ResponseEntity.ok("Eliminado correctamente")
     }
 
+    // JDBC Template
+    @GetMapping("/unitemplate")
+    List<Map<String, Object>> getUniTemplateQuery() {
+        return alumnoService.getUniTemplateQuery()
+    }
+    @GetMapping("/otrotemplate")
+    List<Map<String, Object>> getOtroTemplateQuery() {
+        return alumnoService.getOtroTemplateQuery()
+    }
+
     // DEBUG: Nuke. Borra todos los contenidos de la tabla
     @DeleteMapping(path = "/nuke")
     void deleteAll() {
